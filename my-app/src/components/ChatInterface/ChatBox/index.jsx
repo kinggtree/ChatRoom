@@ -2,7 +2,7 @@ import React from "react";
 import { TextField, Container } from "@mui/material";
 import './styles.css';
 
-function ChatBox() {
+function ChatBox(userInfo) {
   return (
     <Container style={{ height: '100%' }}>
       <div className="chat-container">
