@@ -4,13 +4,14 @@ import Contacts from "./Contacts";
 import TopBar from "./TopBar";
 import {Grid, Paper, Typography, CircularProgress} from "@mui/material";
 import axios from "axios";
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useNavigate } from "react-router-dom"
 
 
 
 function ChatInterface(){
   const[userInfo, setUserInfo]=useState({});
   const[loading, setLoading]=useState(true);
+  const navigate = useNavigate();
 
   useEffect(()=>{
     axios.get('/api/getUserInfo')
@@ -19,6 +20,10 @@ function ChatInterface(){
         setLoading(false);
       })
       .catch((err)=>{
+        if(err.response.status===401){
+          alert("Not logged in yet.");
+          navigate('/');
+        }
         console.log("err occurred: ", err);
         setLoading(false);
       })

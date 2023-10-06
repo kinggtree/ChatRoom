@@ -8,7 +8,13 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   username: {type: String, unique: true},
   password: String,
-  contacts: [String]
+  contacts: [
+    {
+      _id: false,
+      contactUsername: String,
+      contactId: mongoose.Schema.Types.ObjectId
+    }
+  ]
 });
 
 /**

@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { List, ListItemButton, ListItemText } from '@mui/material';
 import './styles.css';
 
-function ListButton({name}) {
-  let link='/chat/'+name;
+function ListButton(item) {
+  let link='/chat/'+item.contactId;
   return (
     <ListItemButton component={Link} to={link}>
-      <ListItemText primary={name} />
+      <ListItemText primary={item.contactUsername} />
     </ListItemButton>
   )
 }
@@ -23,7 +23,7 @@ function Contacts(userInfo) {
 
   return (
     <List component="nav" className="nav-list">
-      {contacts.map((name)=><ListButton key={name} name={name} className="nav-list-item" />)}
+      {contacts.map((item)=><ListButton key={item.contactId} {...item} className="nav-list-item" />)}
     </List>
   )
 }

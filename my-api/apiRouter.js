@@ -8,6 +8,7 @@ mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useUnifiedTopology: true,
 })
 const User=require("./schema/user");
+const Message=require("./schema/message");
 
 // 登录
 router.post('/login', function(req, res) {
@@ -35,13 +36,14 @@ router.post('/login', function(req, res) {
 });
 
 
-
-
 // 获取用户信息
 router.get('/getUserInfo', function(req, res) {
+  if(!req.session._id)
+    return res.status(401).send();
   res.status(200).send({
     'username': req.session.username,
-    'contacts': req.session.contacts
+    'contacts': req.session.contacts,
+    '_id': req.session._id
   });
 });
 
@@ -54,6 +56,34 @@ router.post('/logout', function(req, res) {
       res.status(200).send("Log Out success!");
     }
   });
+});
+
+router.post('/sendMessage', function(req,res){
+  if(!req.session._id)
+    return res.status(401).send("No session!");
+
+  try {
+    Message.create({
+      sender: {
+        senderName: req.body.sender.senderName,
+        senderId: new mongoose.Types.ObjectId(req.body.sender.senderId)
+      },
+      receiver:{
+        receiverName: req.body.receiver.receiverName,
+        receiverId: new mongoose.Types.ObjectId(req.body.receiver.receiverId)
+      },
+      message: {
+        messageType: req.body.message.type,
+        messageContent: req.body.message.content
+      },
+      date: new Date()
+    })
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("internal server error!");
+  }
+  
+  res.status(200).send();
 });
 
 

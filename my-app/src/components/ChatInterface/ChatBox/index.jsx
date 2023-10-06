@@ -1,8 +1,19 @@
-import React from "react";
-import { TextField, Container } from "@mui/material";
+import React, { useLayoutEffect } from "react";
+import { Container } from "@mui/material";
+import ChatInput from "../ChatInput";
 import './styles.css';
+import axios from "axios";
 
 function ChatBox(userInfo) {
+  const ws=useRef<WebSocket | null>(null);
+  const [message, setMessage]=useState();
+
+  useLayoutEffect(()=>{
+    ws.current=new WebSocket('ws://localhost:5000');
+    //https://zhuanlan.zhihu.com/p/275128511
+  })
+
+
   return (
     <Container style={{ height: '100%' }}>
       <div className="chat-container">
@@ -12,13 +23,7 @@ function ChatBox(userInfo) {
         </div>
 
         {/* 输入框区域 */}
-        <div className="input-area">
-          <TextField 
-            fullWidth 
-            variant="outlined" 
-            placeholder="Type your message..." 
-          />
-        </div>
+        <ChatInput {...userInfo} />
       </div>
     </Container>
   );
