@@ -41,13 +41,12 @@ wss.on('connection', (ws, req)=>{
       })
     } catch (err) {
       console.log(err);
-      // 发送错误
     }
   });
 
   
-  // 间隔5s发送数据
-  setInterval(()=>{
+  // 间隔1s发送数据
+  const intervalId = setInterval(()=>{
     Message.find({
       $or: [
         {'sender.senderId': senderId, 'receiver.receiverId': receiverId},
@@ -62,8 +61,16 @@ wss.on('connection', (ws, req)=>{
         console.log("sended messages from server!");
         ws.send(JSON.stringify(messages));
       }
-    );
+    ).catch((err)=>{
+      console.log("message cannot be saved!: ",err);
+      ws.send(JSON.stringify({error: 'message cannot be saved!'}));
+    });
   }, 1000);
+
+  ws.on('close', () => {
+    clearInterval(intervalId);
+    console.log('WebSocket connection closed.');
+  });
   
 })
 

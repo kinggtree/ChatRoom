@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const bcrypt = require('bcrypt');
 
 const mongoose=require("mongoose");
 mongoose.Promise = require("bluebird");
@@ -10,30 +11,96 @@ mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
 const User=require("./schema/user");
 const Message=require("./schema/message");
 
+// 注册
+router.post('/signup', function(req, res){
+
+  newUsername=req.body.newUsername;
+
+  User.findOne({username: newUsername})
+    .then(existUser=>{
+      if(existUser) {
+        res.status(400).send("user already exists...");
+        return;
+      }
+
+      return User.create({
+        username: req.body.newUsername,
+        password: req.body.newPassword,
+        contacts:[]
+      })
+    }).then((newUser)=>{
+    if(newUser)
+    {
+      res.status(200).send("successfully register user.");
+    }
+  }).catch(err=>{
+    res.status(500).send("register error: ", err);
+  });
+});
+
 // 登录
 router.post('/login', function(req, res) {
   User.findOne({username: req.body.username})
-  .then((user, err)=>{
-    if(err){
-      res.status(500).send("database query wrong!");
-    } else if (!user) {
+  .then((user)=>{
+    if (!user) {
       res.status(401).send("username wrong!");
     } else {
-      if(req.body.password===user.password) {
-        const session=req.session;
-        session['username'] = user.username;
-        session['contacts'] = user.contacts;
-        session['_id'] = user._id;
-        res.status(200).send("login success!");
-      } else {
-        res.status(400).send("password wrong!");
-      }
+      bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+        if(err){
+          res.status(500).send("authentication error!");
+        } else if(!isMatch){
+          res.status(400).send('password wrong!');
+        } else {
+          const session=req.session;
+          session['username'] = user.username;
+          session['contacts'] = user.contacts;
+          session['_id'] = user._id;
+          res.status(200).send("login success!");
+        };
+      })
+      
     };
   }).catch((err)=>{
     console.log(err);
     res.status(500).send("err in ", err);
   })
 });
+
+
+// 添加新朋友
+router.post('/newFriend', async function(req, res) {
+  try {
+    if(req.body.friendName === req.session.username) {
+      return res.status(401).send("cannot add yourself...");
+    }
+    
+    // Find user
+    const user = await User.findOne({username: req.body.friendName});
+    
+    if(!user || user.contactUsername === '') {
+      return res.status(401).send("No such person.");
+    }
+    
+    const newFriend = {
+      contactUsername: user.username,
+      contactId: user._id
+    };
+    
+    // Add new friend
+    await User.findOneAndUpdate(
+      {username: req.session.username},
+      {$push: {contacts: newFriend}},
+      {new: true, useFindAndModify: false}
+    );
+    
+    res.status(200).send("new friend add finished.");
+    
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error occurred: ", err);
+  }
+});
+
 
 
 // 获取用户信息

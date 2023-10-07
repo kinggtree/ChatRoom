@@ -30,8 +30,12 @@ function LoginForm() {
             alert("Failed to log in due to "+err.response.data);
         });
         //调用API，将username和password发送到服务器进行验证
-
     };
+
+    const toSignUp=(e)=>{
+        e.preventDefault();
+        navigate('/sign-up');
+    }
 
     return (
         <form className="login-form">
@@ -50,6 +54,9 @@ function LoginForm() {
             />
             <Button variant="contained" onClick={handleSubmit}>
                 Log in
+            </Button>
+            <Button variant='outlined' onClick={toSignUp}>
+                Sign Up
             </Button>
         </form>
     );

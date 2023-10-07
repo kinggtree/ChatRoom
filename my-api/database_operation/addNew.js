@@ -87,7 +87,7 @@ const userToAdd = 'admin';
 
 
 (async function initialize() {
-  //await addNewUsers(newUsers);
+  await addNewUsers(newUsers);
   await addUserToContacts(username, userToAdd);
 })();
 
