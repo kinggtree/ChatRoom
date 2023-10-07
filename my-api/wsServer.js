@@ -2,6 +2,7 @@
 var WebSocket=require('ws');
 const mongoose=require("mongoose");
 mongoose.Promise = require("bluebird");
+const url = require('url');
 mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -14,34 +15,56 @@ const wss=new WebSocket.Server({noServer: true});
 wss.on('connection', (ws, req)=>{
   console.log('WebSocket connection established.');
 
+  // 使用URL来解析
+  const parsedUrl=url.parse(req.url, true);
+  const senderId=new mongoose.Types.ObjectId(parsedUrl.query.senderId);
+  const receiverId=new mongoose.Types.ObjectId(parsedUrl.query.receiverId);
 
-  ws.on('message', (messageObj)=>{
+
+  ws.on('message', (message)=>{
+    const messageObj=JSON.parse(message);
     try {
       Message.create({
-        // 见express api部分
+        sender: {
+          senderName: messageObj.sender.senderName,
+          senderId: new mongoose.Types.ObjectId(messageObj.sender.senderId)
+        },
+        receiver:{
+          receiverName: messageObj.receiver.receiverName,
+          receiverId: new mongoose.Types.ObjectId(messageObj.receiver.receiverId)
+        },
+        message: {
+          messageType: messageObj.message.type,
+          messageContent: messageObj.message.content
+        },
+        date: new Date()
       })
     } catch (err) {
       console.log(err);
-      res.status(500).send("internal server error!");
+      // 发送错误
     }
   });
 
-  const senderId=new mongoose.Types.ObjectId(req.body._id);
-  const receiverId=new mongoose.Types.ObjectId(req.body.receiverId);    //这里需要ChatBox来正确传入receiverId
-
-  Message.find({
-    'sender.senderId': senderId,
-    'receiver.receiverId': receiverId
-  })
-    .then((messages, err)=>{
-      if(err){
-        console.log(err);
-        return;
+  
+  // 间隔5s发送数据
+  setInterval(()=>{
+    Message.find({
+      $or: [
+        {'sender.senderId': senderId, 'receiver.receiverId': receiverId},
+        {'sender.senderId': receiverId, 'receiver.receiverId': senderId}
+      ] 
+    })
+      .then((messages, err)=>{
+        if(err){
+          console.log(err);
+          return;
+        }
+        console.log("sended messages from server!");
+        ws.send(JSON.stringify(messages));
       }
-
-      ws.send(JSON.stringify(messages));
-    });
-
+    );
+  }, 1000);
+  
 })
 
 module.exports = wss;

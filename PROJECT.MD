@@ -53,16 +53,6 @@
 5. 根据测试结果和用户反馈，对聊天室进行迭代和改进。
 
 
-# React文件结构
+# 部分参数讲解
 
-在src目录下：
-
-assets/         # 存放图片、样式、字体等静态资源
-
-components/     # 存放UI组件，这些组件通常是纯粹的，只接收props并且渲染它们
-
-containers/     # 存放容器组件，这些组件包含状态和逻辑，通常包装并使用UI组件
-
-utils/          # 存放实用函数，你可能在应用中的多个位置使用这些函数
-
-services/       # 存放api调用相关的代码
+1. 在ChatInterface以及其里面的组件中，userInfo已经包含了一个比较完整的用户内容。包括当前用户名（username），用户id（_id）。其中的通讯录中包括用户名(contactUsername)，用户ID(contactId)

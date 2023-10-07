@@ -58,6 +58,7 @@ router.post('/logout', function(req, res) {
   });
 });
 
+// 由websocket代替
 router.post('/sendMessage', function(req,res){
   if(!req.session._id)
     return res.status(401).send("No session!");

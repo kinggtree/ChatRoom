@@ -1,12 +1,14 @@
-import axios from "axios";
-import React, { useState } from "react";
+//import axios from "axios";
+import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { TextField, Button } from "@mui/material";
+import WebSocketContext from '../WebSocketContext'; 
 
 
 function ChatInput(userInfo){
   const [content, setContent]=useState();
   const location=useLocation();
+  const ws=useContext(WebSocketContext);
 
   const handleSubmit=(e)=>{
     e.preventDefault();
@@ -32,17 +34,11 @@ function ChatInput(userInfo){
       }
     }
 
-    console.log(message);
-
-    axios.post('/api/sendMessage', message)
-      .then((response)=>{
-        if(response.status===200){
-          //清除输入框内容（暂未解决）
-          setContent('');
-        }
-      }).catch((err)=>{
-        alert('error occurred: ',err.response);
-    });
+    if(ws && ws.readyState===WebSocket.OPEN){
+      console.log("sended message!");
+      ws.send(JSON.stringify(message));
+      setContent('');
+    }
   }
 
   const handleChange=(e)=>{

@@ -7,6 +7,8 @@
 var app = require('../app');  // Express部分
 var wss = require('../wsServer');   //webserver部分
 var http = require('http');
+var session = require("express-session");
+
 
 /**
  * Get port from environment and store in Express.
@@ -23,8 +25,15 @@ var server = http.createServer(app);
 
 // 升级 HTTP 服务器到 WebSocket
 server.on('upgrade', (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, (ws) => {
+  // 初始化session
+  session({
+    secret: 'secretKey',
+    resave: false,
+    saveUninitialized: false
+  })(request, {}, () => {
+    wss.handleUpgrade(request, socket, head, (ws) => {
       wss.emit('connection', ws, request);
+    });
   });
 });
 
