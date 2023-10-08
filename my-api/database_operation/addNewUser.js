@@ -1,4 +1,7 @@
-const mongoose = require("mongoose");
+请使用注册方法，手动添加的方法目前已经被禁止
+
+
+/*const mongoose = require("mongoose");
 mongoose.Promise = require("bluebird");
 mongoose.set("strictQuery", false);
 mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
@@ -95,3 +98,5 @@ const userToAdd = 'admin';
 //紧接着另一对括号用于立即调用该函数（通常缩写为 IIFE，立即调用的函数表达式），
 //是一个在JavaScript中常用的模式。它的主要目的是创建一个新的作用域，避免污染全局作用域，
 //并且允许函数立即执行。
+
+*/

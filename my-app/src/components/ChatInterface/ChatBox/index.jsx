@@ -59,20 +59,36 @@ function ChatBox(userInfo) {
     // 在组件卸载或者 WebSocket 的值改变时需要关闭它：
     return () => {
       ws.current && ws.current.close();
-  };
+      setMessage();
+    };
   },[location.pathname, userInfo._id]);
 
   useEffect(()=>{
-    if(socket){
-      socket.onmessage=function(event){
-        setMessage(JSON.parse(event.data));
-        console.log(JSON.parse(event.data));
-        console.log("received message.");
-        //需要后端发送消息
+    const fetchMessage=async ()=>{
+      try{
+        socket.onmessage=function(event){
+        if(!message) {
+          setMessage(JSON.parse(event.data));
+          console.log("received message.");
+        }
+        else {
+          // 实际上并没有创建副本。这部分代码需要重新优化
+          let newMessage=message;
+          JSON.parse(event.data).map(item=>newMessage.push(item));
+          setMessage(newMessage);
+          console.log("received new message.");
+        }
       }
+      } catch (err){
+        console.log(err);
+      }
+    };
+
+    if(socket){
+      fetchMessage();
     }
-    }, [socket]);
-  
+    
+  }, [socket]);
   
 
 
@@ -86,7 +102,7 @@ function ChatBox(userInfo) {
               item.send=false;
               if(item.sender.senderName===userInfo.username)
                 item.send=true;
-            return <ChatMessage {...item} />
+            return <ChatMessage {...item} key={item._id} />   //这里的key是给react看的
             }) : "Chat message goes here."}
           </div>
 
