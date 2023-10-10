@@ -6,7 +6,7 @@ import WebSocketContext from '../WebSocketContext';
 
 
 function ChatInput(userInfo){
-  const [content, setContent]=useState();
+  const [content, setContent]=useState('');
   const location=useLocation();
   const ws=useContext(WebSocketContext);
 

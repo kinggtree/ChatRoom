@@ -75,6 +75,7 @@ wss.on('connection', (ws, req)=>{
   changeStream.on('change', (change)=>{
     if(change.operationType==='insert'){
       const newMessage=change.fullDocument;
+      newMessage.isNewMessage=true;
       console.log("sended new message from server!");
       ws.send(JSON.stringify(newMessage));
     }

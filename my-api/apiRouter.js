@@ -67,7 +67,7 @@ router.post('/login', function(req, res) {
 });
 
 
-// 添加新朋友
+// 添加新朋友（需要实现对方也要加入我的好友
 router.post('/newFriend', async function(req, res) {
   try {
     if(req.body.friendName === req.session.username) {

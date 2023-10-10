@@ -31,7 +31,7 @@ function LogOut(){
 }
 
 function AddFriend() {
-  const[friendName, setFriendname]=useState();
+  const[friendName, setFriendname]=useState('');
   const[open, setOpen]=useState(false);
 
   const handleSubmit=function(e){
@@ -53,6 +53,10 @@ function AddFriend() {
   const handleClick=function(){
     setOpen(true);
   }
+  
+  const handleClose=function(){
+    setOpen(false);
+  }
 
   return(
     <div>
@@ -71,6 +75,9 @@ function AddFriend() {
           />
           <Button variant="contained" onClick={handleSubmit}>
             添加
+          </Button>
+          <Button variant="outlined" onClick={handleClose}>
+            关闭
           </Button>
         </DialogActions>
     </Dialog>

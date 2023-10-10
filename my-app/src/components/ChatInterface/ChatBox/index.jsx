@@ -46,7 +46,7 @@ function ChatMessage( item ) {
 function ChatBox(userInfo) {
   const ws=useRef(null);
   const [socket, setSocket]=useState();
-  const [message, setMessage]=useState();
+  const [message, setMessage]=useState([]);
   const location=useLocation();
 
 
@@ -59,7 +59,7 @@ function ChatBox(userInfo) {
     // 在组件卸载或者 WebSocket 的值改变时需要关闭它：
     return () => {
       ws.current && ws.current.close();
-      setMessage();
+      setMessage([]);
     };
   },[location.pathname, userInfo._id]);
 
@@ -67,17 +67,21 @@ function ChatBox(userInfo) {
     const fetchMessage=async ()=>{
       try{
         socket.onmessage=function(event){
-        if(!message) {
-          setMessage(JSON.parse(event.data));
-          console.log("received message.");
-        }
-        else {
-          // 实际上并没有创建副本。这部分代码需要重新优化
-          let newMessage=message;
-          JSON.parse(event.data).map(item=>newMessage.push(item));
-          setMessage(newMessage);
-          console.log("received new message.");
-        }
+          let receivedMessage=JSON.parse(event.data);
+          if(receivedMessage.length!==undefined || !receivedMessage.isNewMessage) {
+            receivedMessage.map((item)=>{
+              setMessage((prevMessage)=>{
+                return [...prevMessage, item];
+              });
+            });
+            console.log("received message.");
+          }
+          else {
+            console.log("received new message.");
+            setMessage((prevMessage)=>{
+              return [...prevMessage, receivedMessage];
+            })
+          }
       }
       } catch (err){
         console.log(err);
