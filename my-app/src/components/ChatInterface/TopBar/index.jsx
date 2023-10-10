@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogTitle, TextField, Toolbar, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Toolbar, Typography } from "@mui/material";
 import React, { useState } from "react";
 import './styles.css';
 import axios from "axios";
@@ -16,10 +16,10 @@ function LogOut(){
         alert("Successfully logout!");
         navigate('/');
       } else {
-        alert("Log out wrong!");
+        alert("err: "+response.data);
       }
-     }).catch(()=>{
-      alert("Log out wrong due to server error!");
+     }).catch((err)=>{
+      alert("err: "+err.response.data);
      })
   });
 
@@ -30,7 +30,7 @@ function LogOut(){
   )
 }
 
-function AddFriend() {
+function AddFriend({updateInfo}) {
   const[friendName, setFriendname]=useState('');
   const[open, setOpen]=useState(false);
 
@@ -38,25 +38,20 @@ function AddFriend() {
     e.preventDefault();
     axios.post('/api/newFriend', {friendName: friendName})
       .then(function(response){
-        if(response.status===200)
-        {
-          alert("Add frineds finished!");
+        if(response.status===200){
+          alert("Add frined finished!");
+          updateInfo();
           setOpen(false);
+        } else {
+          alert(response.data);
         }
-        else
-          alert("err: "+response.data);
       }).catch(err=>{
-        alert('err: '+err.response.data);
+        alert('err: '+err);
       });
   };
 
-  const handleClick=function(){
-    setOpen(true);
-  }
-  
-  const handleClose=function(){
-    setOpen(false);
-  }
+  const handleClick = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return(
     <div>
@@ -67,12 +62,14 @@ function AddFriend() {
       aria-describedby="alert-dialog-description"
       >
         <DialogTitle>输入好友名称</DialogTitle>
-        <DialogActions>
+        <DialogContent>
           <TextField
             value={friendName} 
             onChange={e=>{setFriendname(e.target.value)}}
             label='Friend Name'
           />
+        </DialogContent>
+        <DialogActions>
           <Button variant="contained" onClick={handleSubmit}>
             添加
           </Button>
@@ -82,22 +79,19 @@ function AddFriend() {
         </DialogActions>
     </Dialog>
     </div>
-    
-  )
+  );
 }
 
-function TopBar(userInfo) {
-
-  var username=userInfo.username;
-
+// 从userInfo中直接解析出姓名
+function TopBar({username, updateInfo}) {
 
   return(
     <Toolbar className="top-bar">
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
         Welcome, user {username}.
       </Typography>
-      <LogOut {...username}/>
-      <AddFriend />
+      <LogOut />
+      <AddFriend updateInfo={updateInfo}/>
     </Toolbar>
   )
 }

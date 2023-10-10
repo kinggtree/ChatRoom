@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ChatBox from "./ChatBox";
 import Contacts from "./Contacts";
 import TopBar from "./TopBar";
@@ -7,14 +7,14 @@ import axios from "axios";
 import { Route, Routes, useNavigate } from "react-router-dom"
 
 
-
 function ChatInterface(){
   const[userInfo, setUserInfo]=useState({});
   const[loading, setLoading]=useState(true);
+  const[reRender, setReRender]=useState(false);
   const navigate = useNavigate();
 
   useEffect(()=>{
-    axios.get('/api/getUserInfo')
+    axios.post('/api/getUserInfo')
       .then((response)=>{
         setUserInfo(response.data);
         setLoading(false);
@@ -23,22 +23,28 @@ function ChatInterface(){
         if(err.response.status===401){
           alert("Not logged in yet.");
           navigate('/');
+        } else {
+          alert("err occurred: "+err);
+          setLoading(false);
         }
-        console.log("err occurred: ", err);
-        setLoading(false);
-      })
-  }, []); // 加上空依赖数组，这样这个effect只会在组件mount的时候执行一次
+      });
+  }, [reRender]); // 加上空依赖数组，这样这个effect只会在组件mount的时候执行一次
+
+  const updateInfo=()=>{
+    setReRender(!reRender);
+  }
 
   if(loading) {
     return <CircularProgress />
   }
+
 
   return(
     <div>
       <Grid container spacing={2}>
 
         <Grid item xs={12}>
-          <TopBar {...userInfo}/>
+          <TopBar {...userInfo} updateInfo={updateInfo}/>
         </Grid>
 
         <Grid item sm={3}>

@@ -19,7 +19,6 @@ function LoginForm() {
         .then(response=>{
             if(response.status===200){
                 alert("Login successsfully!");
-                console.log('Logging in with username: ', username, ' and password: ', password);
                 navigate('/chat');
             } else {
                 alert(response.data);

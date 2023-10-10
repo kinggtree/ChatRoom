@@ -41,7 +41,7 @@ wss.on('connection', (ws, req)=>{
       }
     ).catch((err)=>{
       console.log("message cannot be saved!: ",err);
-      ws.send(JSON.stringify({error: 'message cannot be saved!'}));
+      ws.send('error, message cannot be saved!');
     });
   };
   initMessage();
@@ -64,7 +64,7 @@ wss.on('connection', (ws, req)=>{
           messageContent: messageObj.message.content
         },
         date: new Date()
-      })
+      });
     } catch (err) {
       console.log(err);
     }
@@ -75,9 +75,11 @@ wss.on('connection', (ws, req)=>{
   changeStream.on('change', (change)=>{
     if(change.operationType==='insert'){
       const newMessage=change.fullDocument;
-      newMessage.isNewMessage=true;
-      console.log("sended new message from server!");
-      ws.send(JSON.stringify(newMessage));
+      //if(newMessage.sender.senderId===senderId && newMessage.receiver.receiverId===receiverId){
+        newMessage.isNewMessage=true;
+        console.log("sended new message from server!");
+        ws.send(JSON.stringify(newMessage));
+      //}
     }
   })
 

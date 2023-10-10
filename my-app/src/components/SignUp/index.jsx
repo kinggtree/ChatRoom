@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
 function SignUp(){
-  const [username, setUsername]=useState();
-  const [password, setPassword]=useState();
-  const [pw_sec, setPw_sec]=useState();
+  const [username, setUsername]=useState('');
+  const [password, setPassword]=useState('');
+  const [pw_sec, setPw_sec]=useState('');
   const [err, setErr]=useState(false);
   const navigate=useNavigate();
 
