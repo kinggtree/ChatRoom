@@ -69,14 +69,21 @@ router.post('/login', function(req, res) {
 router.post('/newFriend', async function(req, res) {
   try {
     if(req.body.friendName === req.session.username) {
-      return res.status(401).send("cannot add yourself...");
-    }
-    
+      return res.status(401).send("Cannot add yourself...");
+    };
+
     // 找到对方的user信息
     const user = await User.findOne({username: req.body.friendName});
-    
+
     if(!user || user.contactUsername === '') {
       return res.status(401).send("No such person.");
+    };
+
+    // 避免重复添加
+    const existingContact=await User.findOne({_id: req.session._id});
+    
+    if(existingContact){
+      return res.status(401).send("You have already added!");
     }
     
     const newFriend = {
@@ -87,7 +94,7 @@ router.post('/newFriend', async function(req, res) {
     const selfInfo={
       contactUsername: req.session.username,
       contactId: req.session._id
-    }
+    };
     
     // 将对方的User信息添加到自己的联系人中
     await User.findOneAndUpdate(
@@ -108,7 +115,7 @@ router.post('/newFriend', async function(req, res) {
   } catch (err) {
     console.log(err);
     res.status(500).send("Error occurred: ", err.toString());
-  }
+  };
 });
 
 

@@ -46,7 +46,7 @@ function AddFriend({updateInfo}) {
           alert(response.data);
         }
       }).catch(err=>{
-        alert('err: '+err);
+        alert('err: '+err.response.data);
       });
   };
 
