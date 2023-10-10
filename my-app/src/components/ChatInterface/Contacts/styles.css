@@ -1,0 +1,29 @@
+/* 整体列表样式 */
+.nav-list {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;  /* 保持子元素在圆角边界内 */
+}
+
+/* 每一项的样式 */
+.nav-list-item {
+  color: #333;  /* 文本颜色 */
+  border-bottom: 1px solid #ddd;  /* 在每一项底部添加边框 */
+  transition: background-color 0.3s ease;  /* 平滑的背景颜色过渡效果 */
+}
+
+.nav-list-item:last-child {
+  border-bottom: none;  /* 移除最后一项的下边框 */
+}
+
+/* 当鼠标悬停在项目上时的样式 */
+.nav-list-item:hover {
+  background-color: #eee;
+  text-decoration: none;  /* 移除链接的下划线 */
+}
+
+/* ListItemText 主要文本样式 */
+.nav-list-item-text {
+  font-weight: 500;  /* 加粗文本 */
+}

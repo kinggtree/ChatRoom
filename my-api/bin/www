@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');  // Express部分
+var wss = require('../wsServer');   //webserver部分
+var http = require('http');
+var session = require("express-session");
+
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = process.env.PORT || '5000';
+//app.set('port', port);    在express单独运行的时候需要加上
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+// 升级 HTTP 服务器到 WebSocket
+server.on('upgrade', (request, socket, head) => {
+  // 初始化session
+  session({
+    secret: 'secretKey',
+    resave: false,
+    saveUninitialized: false
+  })(request, {}, () => {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit('connection', ws, request);
+    });
+  });
+});
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  console.log(`Server is running on http://localhost:${port}`);
+}

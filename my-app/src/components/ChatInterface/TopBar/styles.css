@@ -1,0 +1,17 @@
+/* TopBar 样式 */
+.top-bar {
+  background-color: #3f51b5; /* 蓝色背景 */
+  color: white; /* 白色文本 */
+  display: flex; /* 使用flex布局 */
+  justify-content: space-between; /* 使内容在两侧分布 */
+  padding: 0 20px; /* 添加左右内边距 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 添加轻微的阴影 */
+}
+
+/* 欢迎信息样式 */
+.top-bar-welcome {
+  flex-grow: 1; /* 使文本占用多余的空间 */
+  display: flex; /* 使用flex布局 */
+  align-items: center; /* 垂直居中内容 */
+}
+
