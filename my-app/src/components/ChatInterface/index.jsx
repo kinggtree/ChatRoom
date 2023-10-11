@@ -28,7 +28,7 @@ function ChatInterface(){
           setLoading(false);
         }
       });
-  }, [reRender]); // 加上空依赖数组，这样这个effect只会在组件mount的时候执行一次
+  }, [reRender]); // 该组件在reRender变化时重新渲染
 
   const updateInfo=()=>{
     setReRender(!reRender);

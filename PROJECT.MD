@@ -1,58 +1,59 @@
-# 我的聊天室项目
+# 部分变量格式详情
 
-这个项目是一个基于Web的，为小群体使用的私人聊天室。在这个项目中，我将使用Node.js作为后端，使用React作为前端，使用WebSocket进行实时通讯。
+#### 1. 数据库中users的储存格式：
+```
+{
+  username: req.body.newUsername,
+  password: req.body.newPassword,
+  contacts:[]
+  profilePictureName: 'default.png'
+}
+```
 
-**前端**：React
+---
 
-**后端**：Node.js
+#### 2. ChatInterface中的userInfo:
+```
+{
+  'username': req.session.username,
+  'contacts': response.contacts,
+  '_id': req.session._id
+}
+```
 
-**实时通讯**：WebSocket
+其中，contacts为一个数组，里面储存的是对象：
+```
+{
+  contactUsername: req.session.username,
+  contactId: req.session._id
+}
+```
 
-**身份验证**：Passport.js
+---
 
-<br>
+#### 3. 新消息的格式：
+```
+{
+  sender: {
+    senderName:'',
+    senderId: new mongoose.Types.ObjectId('')
+  },
+  receiver:{
+    receiverName: '',
+    receiverId: new mongoose.Types.ObjectId('')
+  },
+  message: {
+    messageType: '',
+    messageContent: ''
+  },
+  date: new Date()
+}
+```
 
-# 服务器端架构(Node.js)
+#### 4. 个人信息包含：
+用户名
+个人简介
+头像
+个人资料：性别，生日
 
-服务器端的主要任务是接收和转发消息，以及管理聊天室。主要的组件包括：
-
-**WebSocket服务**：使用WebSocket协议来实现实时通讯。可以使用Node.js库如ws或socket.io来创建WebSocket服务。
-
-**聊天室管理**：需要一个组件来管理聊天室，例如存储当前在线的用户和他们的连接，处理用户进入和离开聊天室的事件。
-
-**消息处理**：当收到一个消息，需要将其转发给聊天室中的其他用户。可能需要存储消息，以便新加入的用户可以看到聊天室的历史消息。
-
-<br>
-
-# 客户端架构(React)
-
-客户端的主要任务是显示消息，以及接收和发送用户输入。主要的组件包括：
-
-**WebSocket客户端**：需要一个WebSocket客户端来与服务器进行通讯。在React组件的生命周期方法中处理WebSocket的连接和消息的收发。
-
-**消息显示**：创建一个React组件来显示消息。这个组件可能有一个props，用于接收消息列表。每当收到新的消息，更新这个props，React会自动更新界面。
-
-**用户输入**：创建一个React组件来处理用户输入。这个组件可能包括一个表单，用户可以在这个表单中输入他们的消息，并按下回车键来发送。提交的事件处理器可以调用WebSocket API来发送消息。
-
-**用户状态管理**：使用React的state或者React的Context API来管理和共享状态。例如，当前用户的信息，当前在线的用户列表等。
-
-<br>
-
-# 开发计划
-
-以下是一个可能的开发计划：
-
-1. 学习和熟悉Node.js和React的使用。
-
-2. 实现一个最基本的聊天室，只支持文本消息的发送和接收。
-
-3. 逐步添加更多的功能，如用户认证，聊天室管理，文件共享等。
-
-4. 对聊天室进行测试，包括单元测试和集成测试。
-
-5. 根据测试结果和用户反馈，对聊天室进行迭代和改进。
-
-
-# 部分参数讲解
-
-1. 在ChatInterface以及其里面的组件中，userInfo已经包含了一个比较完整的用户内容。包括当前用户名（username），用户id（_id）。其中的通讯录中包括用户名(contactUsername)，用户ID(contactId)
+修改密码

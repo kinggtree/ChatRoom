@@ -1,5 +1,7 @@
 https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set-for-testing/
 
+sudo mkdir -p /srv/profile_photos
+
 sudo mkdir -p /srv/mongodb/rs0-0  /srv/mongodb/rs0-1 /srv/mongodb/rs0-2
 
 sudo mongod --replSet rs0 --port 27017 --dbpath /srv/mongodb/rs0-0 --oplogSize 128

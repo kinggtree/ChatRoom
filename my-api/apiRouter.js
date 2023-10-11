@@ -1,13 +1,14 @@
 var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcrypt');
+var fs=require('fs');
 
 const mongoose=require("mongoose");
 mongoose.Promise = require("bluebird");
 mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-})
+});
 const User=require("./schema/user");
 const Message=require("./schema/message");
 
@@ -26,7 +27,8 @@ router.post('/signup', function(req, res){
       return User.create({
         username: req.body.newUsername,
         password: req.body.newPassword,
-        contacts:[]
+        contacts: [],
+        profilePictureName: 'default.png'
       })
     }).then((newUser)=>{
     if(newUser)
@@ -82,7 +84,7 @@ router.post('/newFriend', async function(req, res) {
     // 避免重复添加
     const existingContact=await User.findOne({_id: req.session._id});
     
-    if(existingContact){
+    if(existingContact.length){
       return res.status(401).send("You have already added!");
     }
     
@@ -147,6 +149,29 @@ router.post('/logout', function(req, res) {
   });
 });
 
+//获取指定用户头像-图片URL发送方法
+router.get('/profilePictureURL', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send("No session!");
+
+  try{
+    res.set('Cache-Control', 'no-store');
+    User.findOne({_id: req.session._id})
+      .then((response)=>{
+        const picName=response.profilePictureName;
+        res.status(200).send("http://localhost:5000/static/profile_photos/"+picName);
+
+      }).catch((err)=>{
+        res.status(500).send("internal server error!");
+        console.log(err);
+      });
+  } catch(err) {
+    res.status(500).send("internal server error!");
+    console.log(err);
+  }
+});
+
+
 // 由websocket代替
 router.post('/sendMessage', function(req,res) {
   if(!req.session._id)
@@ -175,6 +200,47 @@ router.post('/sendMessage', function(req,res) {
   
   res.status(200).send();
 });
+
+
+
+//获取指定用户头像-二进制图片数据发送方法
+router.get('/profilePictureBinary', function(req, res){
+  if(!req.session._id)
+  return res.status(401).send("No session!");
+
+  try{
+    res.set('Cache-Control', 'no-store');
+    User.findOne({_id: req.session._id})
+      .then((response)=>{
+        picPath=response.profilePicture;
+
+        var stream=fs.createReadStream(picPath);
+
+        stream.on("data",chunk=>{
+          res.write(chunk);
+        });
+
+        stream.on('error', err => {
+          console.error(err);
+          res.status(500).json({ error: 'Error reading file' });
+        });
+
+        stream.on("end", ()=>{
+          // end 同时也会发送
+          res.status(200).end();
+        });
+
+      })
+      .catch((err)=>{
+        res.status(500).send("internal server error!");
+        console.log(err);
+      });
+  } catch(err){
+    res.status(500).send("internal server error!");
+    console.log(err);
+  }
+});
+
 
 
 module.exports = router;

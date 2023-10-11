@@ -11,11 +11,12 @@ const saltRounds = 10; // 增加这个数值会使哈希过程更加耗时
 const userSchema = new mongoose.Schema({
   username: {type: String, unique: true},
   password: String,
+  profilePictureName: String,
   contacts: [
     {
       _id: false,
       contactUsername: String,
-      contactId: mongoose.Schema.Types.ObjectId
+      contactId: mongoose.Schema.Types.ObjectId,
     }
   ]
 });
