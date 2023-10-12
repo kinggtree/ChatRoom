@@ -13,7 +13,6 @@ function ListButton(item) {
     axios.post('/api/profilePictureURL', {contactId: item.contactId})
      .then((response)=>{
         setPicPath(response.data);
-        console.log(response.data);
      }).catch((err)=>{
       console.log(err);
      });

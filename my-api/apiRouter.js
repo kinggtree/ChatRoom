@@ -213,8 +213,23 @@ router.post('/unfriend',function(req, res){
   }).catch((err)=>{
     console.log(err);
     res.status(500).send("internal server error");
-  })
-})
+  });
+});
+
+router.post('/changeIntro', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+  User.findOneAndUpdate(
+    {_id: req.session._id},
+    {$set: {self_intro: req.body.newIntro}},
+    {new: false, useFindAndModify: true}
+  ).then(()=>{
+    res.status(200).send("finish editing");
+  }).catch((err)=>{
+    console.log(err);
+    res.status(500).send("internal server error");
+  });
+});
 
 
 module.exports = router;

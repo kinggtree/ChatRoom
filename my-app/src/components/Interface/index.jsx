@@ -25,6 +25,7 @@ function Interface(){
           navigate('/');
         } else {
           alert("err occurred: "+err);
+          navigate('/');
           setLoading(false);
         }
       });
