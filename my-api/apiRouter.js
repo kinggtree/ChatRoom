@@ -15,6 +15,15 @@ const Message=require("./schema/message");
 // 注册
 router.post('/signup', function(req, res){
 
+  let profilePicture='';
+  if(req.body.gender==='female'){
+    profilePicture='default_female.png'
+  } else if(req.body.gender==='male') {
+    profilePicture='default.png';
+  } else {
+    profilePicture='gun-ship.jpg';
+  }
+
   newUsername=req.body.newUsername;
 
   User.findOne({username: newUsername})
@@ -28,9 +37,9 @@ router.post('/signup', function(req, res){
         username: req.body.newUsername,
         password: req.body.newPassword,
         contacts: [],
-        profilePictureName: 'default.png',
+        profilePictureName: profilePicture,
         self_intro: 'introduce to yourself!',
-        gender: 'gun-ship'
+        gender: req.body.gender
       })
     }).then((newUser)=>{
     if(newUser)
@@ -152,13 +161,13 @@ router.post('/logout', function(req, res) {
 });
 
 //获取指定用户头像-图片URL发送方法
-router.get('/profilePictureURL', function(req, res){
+router.post('/profilePictureURL', function(req, res){
   if(!req.session._id)
     return res.status(401).send("No session!");
 
   try{
     res.set('Cache-Control', 'no-store');
-    User.findOne({_id: req.session._id})
+    User.findOne({_id: req.body.contactId})
       .then((response)=>{
         const picName=response.profilePictureName;
         res.status(200).send("http://localhost:5000/static/profile_photos/"+picName);
@@ -192,14 +201,19 @@ router.post('/personalProfile', function(req, res) {
     })
 });
 
-router.post('unfriend',function(req, res){
+router.post('/unfriend',function(req, res){
   if(!req.session._id)
     return res.status(401).send();
   User.findOneAndUpdate(
     {_id: req.session._id},
     {$pull: {contacts: req.body}},
     {new: true, useFindAndModify: false}
-  )
+  ).then(()=>{
+    res.status(200).send("finish deleteing");
+  }).catch((err)=>{
+    console.log(err);
+    res.status(500).send("internal server error");
+  })
 })
 
 

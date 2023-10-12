@@ -5,13 +5,15 @@ import './styles.css';
 import axios from 'axios';
 
 function ListButton(item) {
-  let link='/chat/'+item.contactId;
+  let link=item.contactId;
+
   const [picPath, setPicPath]=useState('');
 
   useEffect(()=>{
-    axios.get('/api/profilePictureURL', item.contactId)
+    axios.post('/api/profilePictureURL', {contactId: item.contactId})
      .then((response)=>{
         setPicPath(response.data);
+        console.log(response.data);
      }).catch((err)=>{
       console.log(err);
      });

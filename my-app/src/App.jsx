@@ -1,6 +1,6 @@
 import LoginForm from './components/LoginForm';
 import {HashRouter, Route, Routes } from "react-router-dom"
-import ChatInterface from './components/ChatInterface';
+import Interface from './components/Interface';
 import SignUp from './components/SignUp';
 import './App.css';
 
@@ -15,8 +15,8 @@ function App() {
             element={<LoginForm />}
           />
           <Route
-            path="/chat/*"
-            element={<ChatInterface />}
+            path="/interface/*"
+            element={<Interface />}
           />
           <Route
             path="/sign-up" 

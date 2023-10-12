@@ -1,4 +1,4 @@
-import { Button, TextField } from '@mui/material';
+import { Button, MenuItem, Select, TextField, InputLabel, FormControl } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ function SignUp(){
   const [username, setUsername]=useState('');
   const [password, setPassword]=useState('');
   const [pw_sec, setPw_sec]=useState('');
+  const [gender, setGender]=useState('');
   const [err, setErr]=useState(false);
   const navigate=useNavigate();
 
@@ -19,7 +20,8 @@ function SignUp(){
     }
     const newUser={
       newUsername: username,
-      newPassword: password
+      newPassword: password,
+      gender: gender
     }
     axios.post('/api/signup', newUser)
       .then(response=>{
@@ -32,7 +34,7 @@ function SignUp(){
       }).catch(err=>{
         alert(err.response.data);
       });
-  }
+  };
 
   return(
     <form className="sign-up">
@@ -57,7 +59,20 @@ function SignUp(){
       type="password" 
       value={pw_sec} 
       onChange={e=>setPw_sec(e.target.value)}
-    />
+      />
+      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel id="gender-select-label">Gender</InputLabel>
+        <Select
+          labelId="gender-select" 
+          value={gender} 
+          label="Gender" 
+          onChange={e=>setGender(e.target.value)}
+        >
+          <MenuItem value={'male'}>Male</MenuItem>
+          <MenuItem value={'female'}>Female</MenuItem>
+          <MenuItem value={'gun-ship'}>Armed Helicopters</MenuItem>
+        </Select>
+      </FormControl>
       <Button variant='contained' onClick={handleSubmit}>
         Sign Up
       </Button>

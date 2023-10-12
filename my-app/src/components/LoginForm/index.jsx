@@ -19,7 +19,7 @@ function LoginForm() {
         .then(response=>{
             if(response.status===200){
                 alert("Login successsfully!");
-                navigate('/chat');
+                navigate('/interface');
             } else {
                 alert(response.data);
                 setPassword('');

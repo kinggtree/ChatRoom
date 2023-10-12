@@ -52,7 +52,7 @@ function ChatBox(userInfo) {
 
   useEffect(()=>{
     const senderId=userInfo._id;
-    const receiverId=location.pathname.split('/')[2];
+    const receiverId=location.pathname.split('/')[3];
     ws.current=new WebSocket(`ws://localhost:5000?senderId=${senderId}&receiverId=${receiverId}`);
     setSocket(ws.current);
     

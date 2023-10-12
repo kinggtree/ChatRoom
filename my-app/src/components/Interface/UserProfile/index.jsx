@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './styles.css';
 import axios from "axios";
-import { List, ListItemText, ListItem, IconButton, ListItemAvatar, Avatar } from "@mui/material";
+import { List, ListItemText, ListItem, IconButton, ListItemAvatar, Avatar, CircularProgress } from "@mui/material";
 
 function ContactsItem(item){
     const [friendInfo, setFriendInfo]=useState({});
@@ -10,7 +10,7 @@ function ContactsItem(item){
 
     useEffect(()=>{
         setFriendInfo(item);
-        axios.get('/api/profilePictureURL', item.contactId)
+        axios.post('/api/profilePictureURL', {contactId: item.contactId})
             .then((response)=>{
                 setPicPath(response.data);
             }).catch((err)=>{
@@ -21,6 +21,7 @@ function ContactsItem(item){
     const removeFriend=function(){
         axios.post('/api/unfriend', friendInfo)
         .then(()=>{
+            item.updateInfo();
             alert('remove successfully!');
         }).catch((err)=>{
             console.log(err);
@@ -29,7 +30,6 @@ function ContactsItem(item){
 
     return(
     <ListItem 
-    key={item.contactId}
     secondaryAction={
         <IconButton edge="end" aria-label="delete" onClick={removeFriend}>
             <p>Delete</p>
@@ -49,17 +49,26 @@ function ContactsItem(item){
 
 
 
-const UserProfile = function() {
+const UserProfile = function({updateInfo}) {
     const [personalInfo, setPersonInfo]=useState({});
+    const[loading, setLoading]=useState(true);
+
 
     useEffect(() => {
         axios.post('/api/personalProfile')
         .then((response)=>{
             setPersonInfo(response.data);
+            setLoading(false);
         }).catch((err)=>{
             console.log(err);
         });
     }, []);
+
+
+    if(loading) {
+        return <CircularProgress />
+    }
+
 
     return (
         <div className="user-profile">
@@ -73,7 +82,7 @@ const UserProfile = function() {
             <p className="gender"><strong>Gender: </strong>{personalInfo.gender}</p>
             <List component="nav" className="contacts">
                 {personalInfo.contacts.map((item)=>{
-                    return <ContactsItem {...item} />
+                    return <ContactsItem key={item.contactId} updateInfo={updateInfo} {...item} />
                 })}
             </List>
         </div>

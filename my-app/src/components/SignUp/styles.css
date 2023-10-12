@@ -5,10 +5,14 @@
   max-width: 400px;
   margin: auto;
   text-align: center;
+  display: flex;  
+  flex-direction: column;  
+  align-items: center;  
 }
 
-/* Style the text fields */
-.sign-up .MuiTextField-root {
+/* Style the text fields and Select component */
+.sign-up .MuiTextField-root,
+.sign-up .MuiSelect-root {
   margin: 10px 0;
   width: 100%;
 }
@@ -16,6 +20,7 @@
 /* Style the button */
 .sign-up .MuiButton-root {
   margin-top: 20px;
+  width: 100%;  /* Ensure the button takes the full width */
   background-color: #4CAF50; /* Green */
   color: white;
 }

@@ -60,5 +60,4 @@
   'contacts': response.contacts
 }
 ```
-
-修改密码
+由personalProfile调用

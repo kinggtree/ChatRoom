@@ -16,7 +16,7 @@ function ChatInput(userInfo){
     if(content.trim().length===0)
       return alert('text cannot be null.');
 
-    const receiverId=location.pathname.split('/')[2];
+    const receiverId=location.pathname.split('/')[3];
     const receiverName=userInfo.contacts.find(array=>array.contactId===receiverId).contactUsername;
 
     const message={

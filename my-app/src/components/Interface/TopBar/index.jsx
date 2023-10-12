@@ -89,11 +89,11 @@ function TopBar({username, updateInfo}) {
   const navigate=useNavigate();
 
   const toChat=function(){
-    navigate('/chat');
+    navigate('chat');
   };
 
   const toProfile=function(){
-    navigate('')
+    navigate('profile')
   }
 
   return(
@@ -101,8 +101,10 @@ function TopBar({username, updateInfo}) {
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
         Welcome, user {username}.
       </Typography>
-      <LogOut />
+      <Button variant="contained" onClick={toChat}>Chat</Button>
+      <Button variant="contained" onClick={toProfile}>Personal Profile</Button>
       <AddFriend updateInfo={updateInfo}/>
+      <LogOut />
     </Toolbar>
   )
 }
