@@ -28,7 +28,9 @@ router.post('/signup', function(req, res){
         username: req.body.newUsername,
         password: req.body.newPassword,
         contacts: [],
-        profilePictureName: 'default.png'
+        profilePictureName: 'default.png',
+        self_intro: 'introduce to yourself!',
+        gender: 'gun-ship'
       })
     }).then((newUser)=>{
     if(newUser)
@@ -67,7 +69,7 @@ router.post('/login', function(req, res) {
   })
 });
 
-
+// 添加新好友
 router.post('/newFriend', async function(req, res) {
   try {
     if(req.body.friendName === req.session.username) {
@@ -90,7 +92,7 @@ router.post('/newFriend', async function(req, res) {
     
     const newFriend = {
       contactUsername: user.username,
-      contactId: user._id
+      contactId: user._id,
     };
 
     const selfInfo={
@@ -171,76 +173,34 @@ router.get('/profilePictureURL', function(req, res){
   }
 });
 
-
-// 由websocket代替
-router.post('/sendMessage', function(req,res) {
+// 获取用户个人档案
+router.post('/personalProfile', function(req, res) {
   if(!req.session._id)
-    return res.status(401).send("No session!");
-
-  try {
-    Message.create({
-      sender: {
-        senderName: req.body.sender.senderName,
-        senderId: new mongoose.Types.ObjectId(req.body.sender.senderId)
-      },
-      receiver:{
-        receiverName: req.body.receiver.receiverName,
-        receiverId: new mongoose.Types.ObjectId(req.body.receiver.receiverId)
-      },
-      message: {
-        messageType: req.body.message.type,
-        messageContent: req.body.message.content
-      },
-      date: new Date()
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("internal server error!");
-  }
-  
-  res.status(200).send();
-});
-
-
-
-//获取指定用户头像-二进制图片数据发送方法
-router.get('/profilePictureBinary', function(req, res){
-  if(!req.session._id)
-  return res.status(401).send("No session!");
-
-  try{
-    res.set('Cache-Control', 'no-store');
-    User.findOne({_id: req.session._id})
-      .then((response)=>{
-        picPath=response.profilePicture;
-
-        var stream=fs.createReadStream(picPath);
-
-        stream.on("data",chunk=>{
-          res.write(chunk);
-        });
-
-        stream.on('error', err => {
-          console.error(err);
-          res.status(500).json({ error: 'Error reading file' });
-        });
-
-        stream.on("end", ()=>{
-          // end 同时也会发送
-          res.status(200).end();
-        });
-
-      })
-      .catch((err)=>{
-        res.status(500).send("internal server error!");
-        console.log(err);
+    return res.status(401).send();
+  User.findOne({_id: req.session._id})
+    .then((response)=>{
+      res.status(200).send({
+        'username': req.session.username,
+        'profilePictureURL': "http://localhost:5000/static/profile_photos/"+response.profilePictureName,
+        'self_intro': response.self_intro,
+        'gender': response.gender,
+        'contacts': response.contacts
       });
-  } catch(err){
-    res.status(500).send("internal server error!");
-    console.log(err);
-  }
+    }).catch((err)=>{
+      console.log(err);
+      res.status(400).send(err.toString());
+    })
 });
 
+router.post('unfriend',function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+  User.findOneAndUpdate(
+    {_id: req.session._id},
+    {$pull: {contacts: req.body}},
+    {new: true, useFindAndModify: false}
+  )
+})
 
 
 module.exports = router;

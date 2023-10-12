@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import ChatBox from "./ChatBox";
 import Contacts from "./Contacts";
 import TopBar from "./TopBar";
 import {Grid, Paper, Typography, CircularProgress} from "@mui/material";
 import axios from "axios";
 import { Route, Routes, useNavigate } from "react-router-dom"
+import UserProfile from "../UserProfile";
 
 
 function ChatInterface(){
@@ -66,6 +67,9 @@ function ChatInterface(){
               <Route
                 path=":user_id"
                 element={<ChatBox {...userInfo} />} />
+              <Route
+                path="/user_profile"
+                element={<UserProfile />} />
             </Routes>
           </Paper>
         </Grid>

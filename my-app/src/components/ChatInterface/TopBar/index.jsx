@@ -30,6 +30,7 @@ function LogOut(){
   )
 }
 
+// 添加好友组件
 function AddFriend({updateInfo}) {
   const[friendName, setFriendname]=useState('');
   const[open, setOpen]=useState(false);
@@ -84,6 +85,16 @@ function AddFriend({updateInfo}) {
 
 // 从userInfo中直接解析出姓名
 function TopBar({username, updateInfo}) {
+
+  const navigate=useNavigate();
+
+  const toChat=function(){
+    navigate('/chat');
+  };
+
+  const toProfile=function(){
+    navigate('')
+  }
 
   return(
     <Toolbar className="top-bar">

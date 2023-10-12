@@ -51,9 +51,14 @@
 ```
 
 #### 4. 个人信息包含：
-用户名
-个人简介
-头像
-个人资料：性别，生日
+```
+{
+  'username': req.session.username,
+  'profilePictureURL': "http://localhost:5000/static/profile_photos/"+response.profilePictureName,
+  'self_intro': response.self_intro,
+  'gender': response.gender,
+  'contacts': response.contacts
+}
+```
 
 修改密码
