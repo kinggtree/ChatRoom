@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import ChatInput from "../ChatInput";
 import './styles.css';
 import { useLocation } from "react-router-dom";
 import WebSocketContext from "../WebSocketContext";
 
-function ChatMessage( item ) {
+function ChatMessage({ sender, message, send }) {
+  const isSentByCurrentUser = send;
+
   const style = {
     chatContainer: {
       display: 'flex',
-      justifyContent: item.send ? 'flex-end' : 'flex-start',
+      justifyContent: isSentByCurrentUser ? 'flex-end' : 'flex-start',
     },
     chatMessage: {
       backgroundColor: '#f8f8f8',
@@ -23,7 +25,7 @@ function ChatMessage( item ) {
       fontWeight: 'bold',
       marginBottom: '5px',
     },
-    message: {
+    messageContent: {
       marginTop: '10px',
     },
   };
@@ -31,9 +33,8 @@ function ChatMessage( item ) {
   return (
     <div style={style.chatContainer}>
       <div style={style.chatMessage}>
-        <p style={style.senderAndReceiver}>Sender: {item.sender.senderName}</p>
-        <p style={style.senderAndReceiver}>Receiver: {item.receiver.receiverName}</p>
-        <p style={style.message}>{item.message.messageContent}</p>
+        <p style={style.senderAndReceiver}>Sender: {sender.senderName}</p>
+        <p style={style.messageContent}>{message.messageContent}</p>
       </div>
     </div>
   );
@@ -42,11 +43,12 @@ function ChatMessage( item ) {
 
 
 
-
+// 聊天框部分
 function ChatBox(userInfo) {
   const ws=useRef(null);
   const [socket, setSocket]=useState();
   const [message, setMessage]=useState([]);
+  const [friendInfo, setFriendInfo]=useState({});
   const location=useLocation();
 
 
@@ -68,14 +70,17 @@ function ChatBox(userInfo) {
       try{
         socket.onmessage=function(event){
           let receivedMessage=JSON.parse(event.data);
-          if(receivedMessage.length!==undefined || !receivedMessage.isNewMessage) {
-            receivedMessage.map((item)=>{
+          // 初始化数据
+          if(!receivedMessage.isNewMessage || receivedMessage.messages!==undefined) {
+            setFriendInfo(receivedMessage.friendInfo);
+            receivedMessage.messages.map((item)=>{
               setMessage((prevMessage)=>{
                 return [...prevMessage, item];
               });
             });
             console.log("received message.");
           }
+          // 新消息
           else {
             console.log("received new message.");
             setMessage((prevMessage)=>{
@@ -100,6 +105,9 @@ function ChatBox(userInfo) {
     <WebSocketContext.Provider value={ws.current}>
       <Container style={{ height: '100%' }}>
         <div className="chat-container">
+          <Typography variant="h6">
+            {friendInfo.username}
+          </Typography>
           {/* 聊天信息显示区域 */}
           <div className="message-area">
             {message ? message.map((item)=>{

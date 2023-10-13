@@ -5,7 +5,9 @@
 {
   username: req.body.newUsername,
   password: req.body.newPassword,
-  contacts:[]
+  contacts:[],
+  self_intro: 'introduce to yourself!',
+  gender: '',
   profilePictureName: 'default.png'
 }
 ```
@@ -50,6 +52,8 @@
 }
 ```
 
+---
+
 #### 4. 个人信息包含：
 ```
 {
@@ -61,3 +65,21 @@
 }
 ```
 由personalProfile调用
+
+---
+
+#### 5. 建立websocket后初始化数据内容：
+```
+let messageContent={
+  'message': {},
+  'friendInfo': {}
+};
+```
+
+---
+### 6. key.txt
+
+该文件中16位字符串用于注册。每整点自动刷新
+目录：/my-api/key.txt
+
+

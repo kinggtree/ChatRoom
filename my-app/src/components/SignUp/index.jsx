@@ -9,6 +9,7 @@ function SignUp(){
   const [password, setPassword]=useState('');
   const [pw_sec, setPw_sec]=useState('');
   const [gender, setGender]=useState('');
+  const [key, setKey]=useState('');
   const [err, setErr]=useState(false);
   const navigate=useNavigate();
 
@@ -21,7 +22,8 @@ function SignUp(){
     const newUser={
       newUsername: username,
       newPassword: password,
-      gender: gender
+      gender: gender,
+      key: key
     }
     axios.post('/api/signup', newUser)
       .then(response=>{
@@ -73,6 +75,14 @@ function SignUp(){
           <MenuItem value={'gun-ship'}>Armed Helicopters</MenuItem>
         </Select>
       </FormControl>
+      <TextField 
+       required 
+       error={err} 
+       label="Key" 
+       type='text' 
+       value={key}
+       onChange={e=>setKey(e.target.value)}
+      />
       <Button variant='contained' onClick={handleSubmit}>
         Sign Up
       </Button>

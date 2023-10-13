@@ -8,6 +8,7 @@ mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useUnifiedTopology: true,
 })
 const Message=require("./schema/message");
+const User=require("./schema/user");
 const changeStream=Message.watch();
 
 
@@ -24,25 +25,71 @@ wss.on('connection', (ws, req)=>{
 
 
   // 建立连接后发送所有数据
-  const initMessage=()=>{
-    Message.find({
-      $or: [
-        {'sender.senderId': senderId, 'receiver.receiverId': receiverId},
-        {'sender.senderId': receiverId, 'receiver.receiverId': senderId}
-      ] 
-    })
-      .then((messages, err)=>{
-        if(err){
-          console.log(err);
-          return;
-        }
-        console.log("sended all messages from server!");
-        ws.send(JSON.stringify(messages));
+  const initMessage=async ()=>{
+
+    let messageContent={
+      'messages': [],
+      'friendInfo': {
+        'username':'',
+        'profilePictureURL':'',
+        'self_intro':''
       }
-    ).catch((err)=>{
+    };
+
+    
+
+    try{
+      const messages=await Message.find({
+        $or: [
+          {'sender.senderId': senderId, 'receiver.receiverId': receiverId},
+          {'sender.senderId': receiverId, 'receiver.receiverId': senderId}
+        ] 
+      });
+
+      //设置messageContent数据
+      messages.map((item)=>{
+        let tempMessage={
+          'sender':{
+            'senderName':'',
+            'senderId':''
+          },
+          'receiver':{
+            'receiverName': '',
+            'receiverId': ''
+          },
+          'message':{
+            'messageType': '',
+            'messageContent': ''
+          },
+          'date':''
+        };
+        tempMessage.sender.senderName=item.sender.senderName;
+        tempMessage.receiver=item.receiver;
+        tempMessage.message=item.message;
+        //tempMessage.date=item.date.date.toLocaleString();    //时间部分后面再说
+        messageContent.messages.push(tempMessage);
+      });
+    } catch(err){
       console.log("message cannot be saved!: ",err);
       ws.send('error, message cannot be saved!');
-    });
+    };
+
+    try{
+      const friend=await User.findOne({
+        _id: receiverId
+      });
+
+      // 设置好友信息
+      messageContent.friendInfo.username=friend.username;
+      messageContent.friendInfo.profilePictureURL="http://localhost:5000/static/profile_photos/"+friend.profilePictureName;
+      messageContent.friendInfo.self_intro=friend.self_intro;
+
+    } catch(err) {
+      console.log("message cannot be saved!: ",err);
+      ws.send('error, friendInfo cannot be saved!');
+    };
+    console.log("sended all messages from server!");
+    ws.send(JSON.stringify(messageContent));
   };
   initMessage();
 
@@ -76,6 +123,10 @@ wss.on('connection', (ws, req)=>{
     if(change.operationType==='insert'){
       const newMessage=change.fullDocument;
       if(newMessage.sender.senderId.toString()===senderId.toString() && newMessage.receiver.receiverId.toString()===receiverId.toString()){
+        newMessage.isNewMessage=true;
+        console.log("sended new message from server!");
+        ws.send(JSON.stringify(newMessage));
+      } else if(newMessage.sender.senderId.toString()===receiverId.toString() && newMessage.receiver.receiverId.toString()===senderId.toString()){
         newMessage.isNewMessage=true;
         console.log("sended new message from server!");
         ws.send(JSON.stringify(newMessage));

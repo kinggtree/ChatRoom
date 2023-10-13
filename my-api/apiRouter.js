@@ -10,45 +10,58 @@ mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useUnifiedTopology: true,
 });
 const User=require("./schema/user");
-const Message=require("./schema/message");
 
 // 注册
-router.post('/signup', function(req, res){
+router.post('/signup', async function(req, res){
+  try{
 
-  let profilePicture='';
-  if(req.body.gender==='female'){
-    profilePicture='default_female.png'
-  } else if(req.body.gender==='male') {
-    profilePicture='default.png';
-  } else {
-    profilePicture='gun-ship.jpg';
+    // 输入验证
+    if (!req.body.newUsername || !req.body.newPassword || !req.body.key) {
+      return res.status(400).send("Username, password, and key are required");
+    }
+
+    let key=fs.readFileSync('key.txt', {encoding: 'utf8'});
+    if(key!==req.body.key){
+      return res.status(400).send("Key wrong!");
+    };
+    
+    let profilePicture='';
+    if(req.body.gender==='female'){
+      profilePicture='default_female.png'
+    } else if(req.body.gender==='male') {
+      profilePicture='default.png';
+    } else {
+      profilePicture='gun-ship.jpg';
+    };
+
+    let newUsername=req.body.newUsername;
+
+
+    User.findOne({username: newUsername})
+      .then(existUser=>{
+        if(existUser) {
+          return res.status(400).send("user already exists...");
+        }
+
+        return User.create({
+          username: req.body.newUsername,
+          password: req.body.newPassword,
+          contacts: [],
+          profilePictureName: profilePicture,
+          self_intro: 'introduce to yourself!',
+          gender: req.body.gender
+        })
+      }).then((newUser)=>{
+      if(newUser)
+      {
+        return res.status(200).send("successfully register user.");
+      }
+    });
+  } catch(err){
+    console.log(err);
+    return res.status(500).send("register error");
   }
 
-  newUsername=req.body.newUsername;
-
-  User.findOne({username: newUsername})
-    .then(existUser=>{
-      if(existUser) {
-        res.status(400).send("user already exists...");
-        return;
-      }
-
-      return User.create({
-        username: req.body.newUsername,
-        password: req.body.newPassword,
-        contacts: [],
-        profilePictureName: profilePicture,
-        self_intro: 'introduce to yourself!',
-        gender: req.body.gender
-      })
-    }).then((newUser)=>{
-    if(newUser)
-    {
-      res.status(200).send("successfully register user.");
-    }
-  }).catch(err=>{
-    res.status(500).send("register error: ", err.toString());
-  });
 });
 
 // 登录
@@ -93,9 +106,12 @@ router.post('/newFriend', async function(req, res) {
     };
 
     // 避免重复添加
-    const existingContact=await User.findOne({_id: req.session._id});
+    const existingContact=await User.findOne(
+      {_id: req.session._id},
+      {contacts: {$elemMatch: {contactId: user._id} } } );
+    console.log(existingContact);
     
-    if(existingContact.length){
+    if(existingContact.contacts.length){
       return res.status(401).send("You have already added!");
     }
     

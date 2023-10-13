@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Toolbar, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Toolbar, Typography, Menu, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 import './styles.css';
 import axios from "axios";
@@ -31,9 +31,8 @@ function LogOut(){
 }
 
 // 添加好友组件
-function AddFriend({updateInfo}) {
+function AddFriend({updateInfo, isOpen, setIsOpen}) {
   const[friendName, setFriendname]=useState('');
-  const[open, setOpen]=useState(false);
 
   const handleSubmit=function(e){
     e.preventDefault();
@@ -42,7 +41,7 @@ function AddFriend({updateInfo}) {
         if(response.status===200){
           alert("Add frined finished!");
           updateInfo();
-          setOpen(false);
+          setIsOpen(false);
         } else {
           alert(response.data);
         }
@@ -51,14 +50,13 @@ function AddFriend({updateInfo}) {
       });
   };
 
-  const handleClick = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClick = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
 
   return(
     <div>
-      <Button variant='outlined' onClick={handleClick}>Add Friends</Button>
       <Dialog
-      open={open} 
+      open={isOpen} 
       aria-labelledby="alert-dialog-title" 
       aria-describedby="alert-dialog-description"
       >
@@ -83,30 +81,63 @@ function AddFriend({updateInfo}) {
   );
 }
 
-// 从userInfo中直接解析出姓名
-function TopBar({username, updateInfo}) {
 
-  const navigate=useNavigate();
+function TopBar({ username, updateInfo }) {
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
 
-  const toChat=function(){
-    navigate('chat');
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const toProfile=function(){
-    navigate('profile')
-  }
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
-  return(
+  const toChat = function () {
+    navigate('chat');
+    handleClose();
+  };
+
+  const toProfile = function () {
+    navigate('profile');
+    handleClose();
+  };
+
+  const openAddFriend = () => {
+    setIsAddFriendOpen(true);
+    handleClose();
+  };
+
+  return (
     <Toolbar className="top-bar">
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
         Welcome, user {username}.
       </Typography>
-      <Button variant="contained" onClick={toChat}>Chat</Button>
-      <Button variant="contained" onClick={toProfile}>Personal Profile</Button>
-      <AddFriend updateInfo={updateInfo}/>
+
+      {/* Menu Button */}
+      <Button variant="contained" onClick={handleClick} style={{ marginRight: '16px' }}>
+        Open Menu
+      </Button>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={toChat}>Chat</MenuItem>
+        <MenuItem onClick={toProfile}>Personal Profile</MenuItem>
+        <MenuItem onClick={openAddFriend}>Add Friend</MenuItem>
+      </Menu>
+
+      <AddFriend updateInfo={updateInfo} isOpen={isAddFriendOpen} setIsOpen={setIsAddFriendOpen}/>
+      
       <LogOut />
     </Toolbar>
-  )
+  );
 }
 
 export default TopBar;
+
