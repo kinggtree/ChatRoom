@@ -4,6 +4,7 @@ import ChatInput from "../ChatInput";
 import './styles.css';
 import { useLocation } from "react-router-dom";
 import WebSocketContext from "../WebSocketContext";
+const {REACT_APP_API_BASE_URL}=process.env;
 
 function ChatMessage({ sender, message, send }) {
   const isSentByCurrentUser = send;
@@ -55,7 +56,7 @@ function ChatBox(userInfo) {
   useEffect(()=>{
     const senderId=userInfo._id;
     const receiverId=location.pathname.split('/')[3];
-    ws.current=new WebSocket(`ws://localhost:5000?senderId=${senderId}&receiverId=${receiverId}`);
+    ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${receiverId}`);
     setSocket(ws.current);
     
     // 在组件卸载或者 WebSocket 的值改变时需要关闭它：

@@ -2,10 +2,12 @@ var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcrypt');
 var fs=require('fs');
+require('dotenv').config();
+
 
 const mongoose=require("mongoose");
 mongoose.Promise = require("bluebird");
-mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
+mongoose.connect(process.env.EXPRESS_DATABASE_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -186,7 +188,8 @@ router.post('/profilePictureURL', function(req, res){
     User.findOne({_id: req.body.contactId})
       .then((response)=>{
         const picName=response.profilePictureName;
-        res.status(200).send("http://localhost:5000/static/profile_photos/"+picName);
+        const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+        res.status(200).send(URLPath+picName);
 
       }).catch((err)=>{
         res.status(500).send("internal server error!");
@@ -204,9 +207,10 @@ router.post('/personalProfile', function(req, res) {
     return res.status(401).send();
   User.findOne({_id: req.session._id})
     .then((response)=>{
+      const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
       res.status(200).send({
         'username': req.session.username,
-        'profilePictureURL': "http://localhost:5000/static/profile_photos/"+response.profilePictureName,
+        'profilePictureURL': URLPath+response.profilePictureName,
         'self_intro': response.self_intro,
         'gender': response.gender,
         'contacts': response.contacts
