@@ -1,0 +1,7 @@
+检查防火墙状态： sudo ufw status
+启用/禁用防火墙： sudo ufw enable sudo ufw disable
+允许/拒绝特定端口的流量： sudo ufw allow <port> sudo ufw deny <port>
+允许/拒绝特定服务的流量： sudo ufw allow <service> sudo ufw deny <service>
+允许/拒绝特定IP地址的流量： sudo ufw allow from <IP> sudo ufw deny from <IP>
+删除已设置的规则： sudo ufw delete <rule>
+重置防火墙规则为默认设置： sudo ufw reset

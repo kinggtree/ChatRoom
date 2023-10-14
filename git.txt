@@ -1,0 +1,22 @@
+生成SSH密钥
+ssh-keygen -t rsa -b 4096 -C "ghoststeve2017@outlook.com"
+
+// 打开你生成的SSH公钥，通常位于~/.ssh/id_rsa.pub。你可以使用以下命令来查看和复制它：
+cat ~/.ssh/id_rsa.pub
+
+登录到你的远程仓库（比如GitHub、GitLab等）。
+导航至SSH密钥的设置位置。这个位置根据平台可能略有不同
+
+// 确保你的SSH Agent正在运行并加载了你的私钥。你可以用下面的命令启动SSH Agent并添加你的私钥：
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+
+在你的本地Git配置中设置SSH为默认协议。你可以使用以下命令来设置全局用户名和电子邮件：
+git config --global user.name "kinggtree"
+git config --global user.email "ghoststeve2017@outlook.com"
+
+检查SSH连接
+ssh -T git@github.com
+
+git clone git@github.com:kinggtree/ChatRoom.git
+

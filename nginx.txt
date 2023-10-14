@@ -1,0 +1,43 @@
+nginx配置文件:
+
+文件目录:
+使用nginx -t查看
+
+server {
+    listen 3000;
+
+    location / {
+        root /root/ChatRoom/build;
+        try_files $uri /index.html;
+    }
+    
+    location /api/ {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+
+启动、停止和重启 Nginx
+使用下面的命令可以分别启动、停止和重启 Nginx：
+
+sudo service nginx start
+sudo service nginx stop
+sudo service nginx restart
+
+
+查看 Nginx 错误日志
+cat /var/log/nginx/error.log
+
+端口占用导致无法启动：
+
+使用以下命令查找哪个进程占用了 80 和 3000 端口：
+sudo lsof -i :80
+sudo lsof -i :3000
+
+关闭进程
+其中，12345为PID
+sudo kill -9 12345
