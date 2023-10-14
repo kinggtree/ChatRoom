@@ -24,7 +24,7 @@ function LogOut(){
   });
 
   return(
-    <Button className="top-bar-logout" variant="contained" color="error" onClick={handleSubmit}>
+    <Button className="logout-button" variant="contained" onClick={handleSubmit} color="error">
         Log Out
     </Button>
   )
@@ -32,16 +32,16 @@ function LogOut(){
 
 // 添加好友组件
 function AddFriend({updateInfo, isOpen, setIsOpen}) {
-  const[friendName, setFriendname]=useState('');
+  const[friendName, setFriendName]=useState('');
 
   const handleSubmit=function(e){
-    e.preventDefault();
     axios.post('/api/newFriend', {friendName: friendName})
       .then(function(response){
         if(response.status===200){
           alert("Add frined finished!");
           updateInfo();
           setIsOpen(false);
+          setFriendName('');
         } else {
           alert(response.data);
         }
@@ -50,8 +50,13 @@ function AddFriend({updateInfo, isOpen, setIsOpen}) {
       });
   };
 
-  const handleClick = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
+
+  const handleKeyDown=(e)=>{
+    if(e.key==='Enter'){
+      handleSubmit();
+    }
+  };
 
   return(
     <div>
@@ -64,7 +69,8 @@ function AddFriend({updateInfo, isOpen, setIsOpen}) {
         <DialogContent>
           <TextField
             value={friendName} 
-            onChange={e=>{setFriendname(e.target.value)}}
+            onKeyDown={handleKeyDown}
+            onChange={e=>{setFriendName(e.target.value)}}
             label='Friend Name'
           />
         </DialogContent>
@@ -117,7 +123,7 @@ function TopBar({ username, updateInfo }) {
       </Typography>
 
       {/* Menu Button */}
-      <Button variant="contained" onClick={handleClick} style={{ marginRight: '16px' }}>
+      <Button className="menu-button" variant="contained" onClick={handleClick}>
         Open Menu
       </Button>
       <Menu

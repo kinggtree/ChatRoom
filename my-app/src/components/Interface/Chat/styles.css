@@ -1,0 +1,18 @@
+.chat-interface {
+  margin: 10px;
+  margin-left: 0;
+  height: auto;
+  width: auto;
+}
+
+.contacts {
+  margin: 10px;
+  margin-right: 0;
+  height: auto;
+  width: auto;
+}
+
+button.show-contacts {
+  margin: 10px;
+  margin-left: 25px;
+}

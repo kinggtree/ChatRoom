@@ -15,3 +15,12 @@
   align-items: center; /* 垂直居中内容 */
 }
 
+button.logout-button {
+  padding: 6px; 
+  margin: 10px;
+}
+
+button.menu-button {
+  padding: 6px; 
+  margin: 10px; 
+}

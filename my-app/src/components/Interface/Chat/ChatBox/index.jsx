@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Container, Typography } from "@mui/material";
+import { Container, Paper, Typography } from "@mui/material";
 import ChatInput from "../ChatInput";
 import './styles.css';
 import { useLocation } from "react-router-dom";
@@ -12,29 +12,32 @@ function ChatMessage({ sender, message, send }) {
   const style = {
     chatContainer: {
       display: 'flex',
-      justifyContent: isSentByCurrentUser ? 'flex-end' : 'flex-start',
+      flexDirection: 'column',
+      alignItems: isSentByCurrentUser ? 'flex-end' : 'flex-start',
+      marginBottom: '4px'
     },
     chatMessage: {
       backgroundColor: '#f8f8f8',
       border: '1px solid #ddd',
-      borderRadius: '8px',
-      padding: '10px',
-      margin: '10px 0',
+      borderRadius: isSentByCurrentUser ? '25% 10%' : '10% 25%',
+      padding: '2px',
+      margin: '2px 0',
       maxWidth: '400px',
     },
     senderAndReceiver: {
       fontWeight: 'bold',
       marginBottom: '5px',
+      fontSize: '12px'
     },
     messageContent: {
-      marginTop: '10px',
+      margin: '7px',
     },
   };
 
   return (
     <div style={style.chatContainer}>
+      <p style={style.senderAndReceiver}>Sender: {sender.senderName}</p>
       <div style={style.chatMessage}>
-        <p style={style.senderAndReceiver}>Sender: {sender.senderName}</p>
         <p style={style.messageContent}>{message.messageContent}</p>
       </div>
     </div>
@@ -105,10 +108,12 @@ function ChatBox(userInfo) {
   return (
     <WebSocketContext.Provider value={ws.current}>
       <Container style={{ height: '100%' }}>
-        <div className="chat-container">
-          <Typography variant="h6">
-            {friendInfo.username}
-          </Typography>
+        <Paper className="chat-container">
+          <div className="friend-name">
+            <Typography variant="h6">
+              {friendInfo.username}
+            </Typography>
+          </div>
           {/* 聊天信息显示区域 */}
           <div className="message-area">
             {message ? message.map((item)=>{
@@ -121,7 +126,7 @@ function ChatBox(userInfo) {
 
           {/* 输入框区域 */}
           <ChatInput {...userInfo} />
-        </div>
+          </Paper>
       </Container>
     </WebSocketContext.Provider>
   );

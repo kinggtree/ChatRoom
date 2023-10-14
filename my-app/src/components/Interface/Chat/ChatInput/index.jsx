@@ -3,6 +3,7 @@ import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { TextField, Button } from "@mui/material";
 import WebSocketContext from '../WebSocketContext'; 
+import "./styles.css";
 
 
 function ChatInput(userInfo){
@@ -11,7 +12,6 @@ function ChatInput(userInfo){
   const ws=useContext(WebSocketContext);
 
   const handleSubmit=(e)=>{
-    e.preventDefault();
 
     if(content.trim().length===0)
       return alert('text cannot be null.');
@@ -32,18 +32,25 @@ function ChatInput(userInfo){
         type: 'text',
         content: content
       }
-    }
+    };
 
     if(ws && ws.readyState===WebSocket.OPEN){
       console.log("sended message!");
       ws.send(JSON.stringify(message));
       setContent('');
     }
-  }
+  };
 
   const handleChange=(e)=>{
     setContent(e.target.value);
-  }
+  };
+
+  const handleKeyDown=(e)=>{
+    if(e.key==='Enter') {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
 
   return (
     <div className="input-area">
@@ -51,12 +58,14 @@ function ChatInput(userInfo){
         fullWidth 
         variant="outlined" 
         placeholder="Type your message..." 
-        onChange={handleChange}
-        value={content}     // 确保输入框的值与状态同步
+        onChange={handleChange} 
+        onKeyDown={handleKeyDown}
+        value={content}
+        className="input" 
       />
-      <Button variant="contained" onClick={handleSubmit} >Send</Button>
+      <Button variant="contained" onClick={handleSubmit} className="send" >Send</Button>
     </div>
-  )
+  );
 }
 
 export default ChatInput;

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import ChatBox from "./ChatBox";
 import Contacts from "./Contacts";
-import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer} from "@mui/material";
+import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box} from "@mui/material";
 import { Route, Routes } from "react-router-dom";
+import './styles.css'
 
 function Chat(userInfo){
   const theme = useTheme();
@@ -15,7 +16,7 @@ function Chat(userInfo){
 
   return(
     <div>
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         {/* 使用 isMediumScreen 判断是否要显示 Contacts 组件 */}
         {!isMediumScreen && (
           <Grid item md={3}>
@@ -26,10 +27,10 @@ function Chat(userInfo){
         )}
         
         <Grid item md={isMediumScreen ? 12 : 9}>
-          <Paper className="chat-interface">
+          <div className="chat-interface">
             {/* 当屏幕宽度较小时，显示一个按钮来打开 Drawer */}
             {isMediumScreen && (
-              <Button onClick={handleDrawerToggle}>Show Contacts</Button>
+              <Button onClick={handleDrawerToggle} variant='contained' className='show-contacts'>Show Contacts</Button>
             )}
             <Routes>
               <Route
@@ -45,14 +46,16 @@ function Chat(userInfo){
                 element={<ChatBox {...userInfo} />} 
               />
             </Routes>
-          </Paper>
-        </Grid>        
+          </div>
+        </Grid>
         
       </Grid>
 
       {/* 当屏幕宽度较小时，通过 Drawer 来显示 Contacts 组件 */}
-      <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>
-        <Contacts {...userInfo}/>
+      <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle} className='drawer-contacts'>
+        <Box width={250}>
+          <Contacts {...userInfo}/>
+        </Box>
       </Drawer>
     </div>
   )

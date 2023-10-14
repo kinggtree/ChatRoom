@@ -21,6 +21,9 @@ router.post('/signup', async function(req, res){
     if (!req.body.newUsername || !req.body.newPassword || !req.body.key) {
       return res.status(400).send("Username, password, and key are required");
     }
+    if (req.body.newUsername==='' || req.body.newPassword==='' || req.body.key==='') {
+      return res.status(400).send("Username, password, and key are required");
+    }
 
     let key=fs.readFileSync('key.txt', {encoding: 'utf8'});
     if(key!==req.body.key){
@@ -68,6 +71,11 @@ router.post('/signup', async function(req, res){
 
 // 登录
 router.post('/login', function(req, res) {
+
+  if(req.body.username==='' || req.body.password===''){
+    return res.status(400).send("Username or password is required");
+  }
+
   User.findOne({username: req.body.username})
   .then((user)=>{
     if (!user) {
@@ -89,7 +97,7 @@ router.post('/login', function(req, res) {
     };
   }).catch((err)=>{
     console.log(err);
-    res.status(500).send("err in ", err.toString());
+    res.status(500).send("internal server error!");
   })
 });
 
@@ -111,7 +119,6 @@ router.post('/newFriend', async function(req, res) {
     const existingContact=await User.findOne(
       {_id: req.session._id},
       {contacts: {$elemMatch: {contactId: user._id} } } );
-    console.log(existingContact);
     
     if(existingContact.contacts.length){
       return res.status(401).send("You have already added!");
@@ -218,22 +225,38 @@ router.post('/personalProfile', function(req, res) {
     }).catch((err)=>{
       console.log(err);
       res.status(400).send(err.toString());
-    })
+    });
 });
 
-router.post('/unfriend',function(req, res){
+router.post('/unfriend',async function(req, res){
   if(!req.session._id)
     return res.status(401).send();
-  User.findOneAndUpdate(
-    {_id: req.session._id},
-    {$pull: {contacts: req.body}},
-    {new: true, useFindAndModify: false}
-  ).then(()=>{
-    res.status(200).send("finish deleteing");
-  }).catch((err)=>{
+
+  try{
+    // 删除我方的这个好友
+    await User.findOneAndUpdate(
+      {_id: req.session._id},
+      {$pull: {contacts: req.body}},
+      {new: true, useFindAndModify: false}
+    ).catch((err)=>{
+      console.log(err);
+    });
+
+    // 从对方联系人列表中删除自己
+    await User.findOneAndUpdate(
+      {_id: req.body.contactId},
+      {$pull: {contacts: {contactId: req.session._id} } },
+      {new: true, useFindAndModify: false}
+    ).catch((err)=>{
+      console.log(err);
+    });
+
+    res.status(200).send("delete finish!");
+  } catch(err){
     console.log(err);
     res.status(500).send("internal server error");
-  });
+  };
+
 });
 
 router.post('/changeIntro', function(req, res){

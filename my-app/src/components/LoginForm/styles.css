@@ -1,0 +1,47 @@
+/* LoginForm.css */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8f8f8;  /* 轻微调整背景色为较浅灰色，有助于减轻视觉疲劳 */
+}
+
+.login-form .MuiTextField-root {
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease-in-out;  /* 平滑过渡效果 */
+}
+
+/* 增加输入框焦点效果 */
+.login-form .MuiTextField-root:focus-within {
+  border-color: #007BFF;
+}
+
+.login-form button {
+  align-self: center;
+  padding: 8px 20px;
+  margin: 5px;
+  text-transform: none;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;  /* 添加 transform 过渡效果 */
+}
+
+.login-form button.login {
+  background-color: #007BFF;
+  color: white;
+}
+
+.login-form button.signup {
+  background-color: #359c21;
+  color: white;
+}
+
+
+.login-form button:hover {
+  background-color: #2f716b;
+  transform: scale(1.05);  /* 添加微小的缩放效果 */
+}

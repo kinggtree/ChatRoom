@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom'
 import { TextField, Button } from '@mui/material';
-import './LoginForm.css';
+import './styles.css';
 import axios from 'axios';
 
 function LoginForm() {
@@ -10,7 +10,7 @@ function LoginForm() {
     const navigate=useNavigate();
 
     const handleSubmit=(e)=>{
-        e.preventDefault();
+
         let jsonObj={
             'username': username,
             'password': password
@@ -24,7 +24,7 @@ function LoginForm() {
                 alert(response.data);
                 setPassword('');
                 setUsername('');
-            }
+            };
         }).catch(err=>{
             alert("Failed to log in due to "+err.response.data);
         });
@@ -34,6 +34,13 @@ function LoginForm() {
     const toSignUp=(e)=>{
         e.preventDefault();
         navigate('/sign-up');
+    };
+
+    const handleKeyDown=(e)=>{
+        if(e.key==='Enter'){
+            e.preventDefault();
+            handleSubmit();
+        }
     }
 
     return (
@@ -49,12 +56,13 @@ function LoginForm() {
                 label="Password"
                 type="password"
                 value={password}
+                onKeyDown={handleKeyDown}
                 onChange={e=>setPassword(e.target.value)}
             />
-            <Button variant="contained" onClick={handleSubmit}>
+            <Button variant="contained" onClick={handleSubmit} className='login'>
                 Log in
             </Button>
-            <Button variant='outlined' onClick={toSignUp}>
+            <Button variant='outlined' onClick={toSignUp} className='signup'>
                 Sign Up
             </Button>
         </form>
