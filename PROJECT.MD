@@ -82,4 +82,14 @@ let messageContent={
 该文件中16位字符串用于注册。每整点自动刷新
 目录：/my-api/key.txt
 
+---
+
+### 7. EXPRESS_API_BASE_URL
+
+如果不在系统变量中设置，则其会自动使用/my-api/.env中的参数
+
+推荐设置一下，设置方法：
+
+export EXPRESS_API_BASE_URL=......
+
 

@@ -1,0 +1,10 @@
+1. 全局安装 pm2：
+
+npm install -g pm2
+
+
+然后，在你的项目目录中使用 pm2 启动你的应用：
+
+pm2 start npm --name "your-app-name" -- start
+
+其中 "your-app-name" 是应用名称，用于在 pm2 中识别它。
