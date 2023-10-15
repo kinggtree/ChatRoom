@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Container, Paper } from "@mui/material";
-import ChatInput from "./ChatInput";
+import { Container } from "@mui/material";
+import MessageInput from "./MessageInput";
 import './styles.css';
 import WebSocketContext from "./WebSocketContext";
 const {REACT_APP_API_BASE_URL}=process.env;
@@ -103,7 +103,7 @@ function MessageContent({userInfo, componentInfo}) {
   return (
     <WebSocketContext.Provider value={ws.current}>
       <Container style={{ height: '100%' }}>
-        <Paper className="message-container">
+        <div className="message-container">
 
         <div className="message-area">
           {message ? message.map((item)=>{
@@ -115,9 +115,9 @@ function MessageContent({userInfo, componentInfo}) {
         </div>
 
         {/* 输入框区域 */}
-        <ChatInput {...userInfo} />
+        <MessageInput {...userInfo} />
 
-        </Paper>
+        </div>
       </Container>
     </WebSocketContext.Provider>
   );

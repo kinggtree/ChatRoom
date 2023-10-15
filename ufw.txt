@@ -1,3 +1,5 @@
+apt install ufw
+
 检查防火墙状态： sudo ufw status
 启用/禁用防火墙： sudo ufw enable sudo ufw disable
 允许/拒绝特定端口的流量： sudo ufw allow <port> sudo ufw deny <port>

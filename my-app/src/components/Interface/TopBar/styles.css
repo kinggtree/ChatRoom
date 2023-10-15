@@ -15,8 +15,9 @@
   align-items: center; /* 垂直居中内容 */
 }
 
-
 button.menu-button {
   padding: 6px; 
+  display: flex;
   margin: 10px; 
 }
+

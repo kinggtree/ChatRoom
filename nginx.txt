@@ -7,7 +7,7 @@ server {
     listen 3000;
 
     location / {
-        root /root/ChatRoom/build;
+        root /...;
         try_files $uri /index.html;
     }
     
@@ -20,6 +20,8 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
+
+build的文件目录放在 /... 中
 
 启动、停止和重启 Nginx
 使用下面的命令可以分别启动、停止和重启 Nginx：

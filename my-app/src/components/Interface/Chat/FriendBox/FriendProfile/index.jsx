@@ -24,9 +24,9 @@ function FriendProfile({componentInfo}){
           alt={`${friendProfile.username}'s profile`} 
           className="profile-picture" 
       />
-      <Typography variant="h4">{friendProfile.username}</Typography>
-      <Typography>{friendProfile.self_intro}</Typography>
-      <Typography>{friendProfile.gender}</Typography>
+      <Typography variant="h4" className="friend-name">{friendProfile.username}</Typography>
+      <Typography className="friend-intro">Introduction: {friendProfile.self_intro}</Typography>
+      <Typography className="friend-gender">Gender: {friendProfile.gender}</Typography>
     </div>
   )
 }

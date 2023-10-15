@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, Box } from '@mui/material';
+import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText } from '@mui/material';
 import './styles.css';
 import axios from 'axios';
 

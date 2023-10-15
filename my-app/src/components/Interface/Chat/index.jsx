@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ChatBox from "./ChatBox";
+import FriendBox from "./FriendBox";
 import Contacts from "./Contacts";
 import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box} from "@mui/material";
 import { Route, Routes } from "react-router-dom";
@@ -19,14 +19,14 @@ function Chat(userInfo){
       <Grid container spacing={1}>
         {/* 使用 isMediumScreen 判断是否要显示 Contacts 组件 */}
         {!isMediumScreen && (
-          <Grid item md={3}>
+          <Grid item sm={3}>
             <Paper className="contacts">
               <Contacts {...userInfo}/>
             </Paper>
           </Grid>
         )}
         
-        <Grid item md={isMediumScreen ? 12 : 9}>
+        <Grid item sm={isMediumScreen ? 12 : 9}>
           <div className="chat-interface">
             {/* 当屏幕宽度较小时，显示一个按钮来打开 Drawer */}
             {isMediumScreen && (
@@ -36,19 +36,26 @@ function Chat(userInfo){
               <Route
                 path="/"
                 element={
-                  <Typography variant='body1'>
-                    Welcome to this app!
-                  </Typography>
+                  <Paper sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: '100px'
+                    }}>
+                    <Typography variant='h6'>
+                      Welcome to Chat Room!
+                    </Typography>
+                  </Paper>
+
                 } 
               />
               <Route
                 path=":user_id/*"
-                element={<ChatBox {...userInfo} />} 
+                element={<FriendBox {...userInfo} />} 
               />
             </Routes>
           </div>
         </Grid>
-        
       </Grid>
 
       {/* 当屏幕宽度较小时，通过 Drawer 来显示 Contacts 组件 */}

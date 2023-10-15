@@ -6,6 +6,7 @@ import { List,
     CircularProgress, 
     Typography,
     ListItemButton,
+    Paper,
 } from "@mui/material";
 import { Link, Route, Routes } from "react-router-dom";
 import EditInfo from "./EditInfo";
@@ -58,20 +59,25 @@ const UserProfile = function({updateInfo}) {
         </ListItemButton>
       </List>
 
-      <Routes>
-        <Route
-          path="/editInfo"
-          element={<EditInfo />}
-        />
-        <Route
-          path="/unfriend"
-          element={<ManageContacts {...personalInfo} updateInfo={updateInfo}/>}
-        />
-        <Route
-          path="/changePwd" 
-          element={<EditPwd />}
-        />
-      </Routes>
+      <div className="user-operation">
+
+        <Routes>
+          <Route
+            path="/editInfo"
+            element={<EditInfo />}
+          />
+          <Route
+            path="/unfriend"
+            element={<ManageContacts {...personalInfo} updateInfo={updateInfo}/>}
+          />
+          <Route
+            path="/changePwd" 
+            element={<EditPwd />}
+          />
+        </Routes>
+
+      </div>
+
       
     </div>
 

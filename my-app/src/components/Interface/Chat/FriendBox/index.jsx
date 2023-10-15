@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, IconButton, Paper, Typography, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress } from "@mui/material";
+import { Container, IconButton, Paper, Typography, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress, Toolbar } from "@mui/material";
 import './styles.css';
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -11,7 +11,7 @@ import axios from "axios";
 
 
 // 聊天框部分
-function ChatBox(userInfo) {
+function FriendBox(userInfo) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoading, setIsLoading]=useState(true);
   const [componentInfo, setComponentInfo] = useState({
@@ -71,9 +71,9 @@ function ChatBox(userInfo) {
       <Container style={{ height: '100%' }}>
         <Paper className="chat-container">
 
-          <div className="friend-name">
-            <Typography variant="h6">
-              {componentInfo.username}
+          <Toolbar className="chat-topbar">
+            <Typography variant="h6" className="friend-name">
+              {componentInfo.friendInfo.username}
             </Typography>
 
             <IconButton 
@@ -108,7 +108,7 @@ function ChatBox(userInfo) {
               </MenuItem>
             </Menu>
 
-          </div>
+          </Toolbar>
 
           <Routes>
             <Route
@@ -129,4 +129,4 @@ function ChatBox(userInfo) {
   );
 }
 
-export default ChatBox;
+export default FriendBox;

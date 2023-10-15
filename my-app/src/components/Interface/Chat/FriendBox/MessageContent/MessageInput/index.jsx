@@ -2,12 +2,12 @@
 import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { TextField, Button } from "@mui/material";
-import WebSocketContext from '../../WebSocketContext'; 
+import WebSocketContext from '../WebSocketContext'; 
 import SendIcon from '@mui/icons-material/Send';
 import "./styles.css";
 
 
-function ChatInput(userInfo){
+function MessageInput(userInfo){
   const [content, setContent]=useState('');
   const location=useLocation();
   const ws=useContext(WebSocketContext);
@@ -62,11 +62,11 @@ function ChatInput(userInfo){
         onChange={handleChange} 
         onKeyDown={handleKeyDown}
         value={content}
-        className="input" 
+        className="input-message" 
       />
-      <Button variant="contained" onClick={handleSubmit} className="send" endIcon={<SendIcon />}>Send</Button>
+      <Button variant="contained" onClick={handleSubmit} className="send-button" endIcon={<SendIcon />}>Send</Button>
     </div>
   );
 }
 
-export default ChatInput;
+export default MessageInput;

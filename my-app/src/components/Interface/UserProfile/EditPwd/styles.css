@@ -1,5 +1,11 @@
-.MuiTextField-root,
-.MuiSelect-root {
+.pwd-input {
   margin: 10px 0;
   width: 100%;
+}
+
+.change-password-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
 }

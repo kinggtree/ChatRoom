@@ -1,0 +1,42 @@
+/* 容器样式 */
+.friend-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+  margin: auto;
+}
+
+/* 头像样式 */
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  margin: 10px;
+}
+
+/* 用户名样式 */
+.friend-name {
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #333;
+  
+}
+
+/* 自我介绍样式 */
+.friend-intro {
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* 性别样式 */
+.friend-gender {
+  font-size: 14px;
+  color: #999;
+}

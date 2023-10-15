@@ -36,7 +36,7 @@ function EditPwd(){
   }
 
   return (
-    <form>
+    <form className="change-password-form">
       <TextField 
        required 
        error={err} 
@@ -44,6 +44,10 @@ function EditPwd(){
        type='password' 
        value={originalPassword}
        onChange={e=>setOriginalPassword(e.target.value)}
+       sx={{ 
+        margin: '10px 0',
+        width: '80%',
+      }}
       />
       <TextField 
        required 
@@ -52,6 +56,10 @@ function EditPwd(){
        type='password' 
        value={newPassword}
        onChange={e=>setNewPassword(e.target.value)}
+       sx={{ 
+        margin: '10px 0',
+        width: '80%',
+      }}
       />
       <TextField
       required 
@@ -60,6 +68,10 @@ function EditPwd(){
       type="password" 
       value={pwSec} 
       onChange={e=>setPwSec(e.target.value)}
+      sx={{ 
+        margin: '10px 0',
+        width: '80%',
+      }}
       />
       <Button variant="contained" onClick={handleSubmit}>重置</Button>
     </form>

@@ -5,10 +5,13 @@ import { List,
     ListItem, 
     IconButton, 
     ListItemAvatar, 
-    Avatar
+    Avatar,
+    Typography,
+    Toolbar
     } from "@mui/material";
 import DeleteIcon from'@mui/icons-material/Delete';
-
+import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
+import './styles.css'
 
 
 // 每个联系人的组件
@@ -58,10 +61,48 @@ function ContactsItem(item){
 
 
 function ManageContacts({contacts, updateInfo}){
+  const [currentContact, setCurrentContact]=useState([]);
+  const [isSort, setIsSort]=useState(false);
+
+  const sortContact=()=>{
+    const sortedContacts = contacts.slice().sort((a, b) => {
+      if (a.contactUsername < b.contactUsername) {
+        return -1;
+      } else if (a.contactUsername > b.contactUsername) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    
+    return sortedContacts;
+  }
+
+
+  useEffect(()=>{
+    if(isSort){
+      setCurrentContact(sortContact);
+    } else {
+      setCurrentContact(contacts);
+    };
+  },[isSort]);
+
+
+  const changeSort=()=>{
+    setIsSort(!isSort);
+  }
+
+
   return (
   <div>
+    <Toolbar className="contact-toolbar">
+      <Typography>按字母排序</Typography>
+      <IconButton aria-label="sort" onClick={changeSort}>
+        <SortByAlphaIcon />
+      </IconButton>
+    </Toolbar>
     <List component="nav" className="contacts">
-      {contacts.map((item)=>{
+      {currentContact.map((item)=>{
         return <ContactsItem key={item.contactId} updateInfo={updateInfo} {...item} />
       })}
     </List>

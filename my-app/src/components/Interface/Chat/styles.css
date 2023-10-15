@@ -2,7 +2,16 @@
   margin: 10px;
   margin-left: 0;
   height: auto;
-  width: auto;
+  width: 100%;
+  max-width: 700px;
+
+}
+
+@media (min-width: 700px) {
+  .chat-interface {
+    width: 700px;  /* 固定宽度为500px */
+    margin: 10px auto;  /* 居中显示 */
+  }
 }
 
 .contacts {

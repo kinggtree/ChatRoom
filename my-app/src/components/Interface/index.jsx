@@ -43,7 +43,7 @@ function Interface(){
     <div>
       <Grid container spacing={2}>
 
-        <Grid item xs={12}>
+        <Grid item sm={12}>
           <TopBar {...userInfo} updateInfo={updateInfo} />
         </Grid>
 

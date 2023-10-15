@@ -1,0 +1,24 @@
+/* styles.css */
+
+.chat-container {
+  height: 100%;
+  padding: 15px;
+
+}
+
+div.chat-topbar {
+  text-align: center;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  justify-content: space-between; /* 使内容在两侧分布 */
+  padding: 0 20px; /* 添加左右内边距 */
+}
+
+.friend-name {
+  flex-grow: 1; /* 使文本占用多余的空间 */
+  display: flex; /* 使用flex布局 */
+  align-items: center; /* 垂直居中内容 */
+}
+
+
