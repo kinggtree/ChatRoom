@@ -1,134 +1,131 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Container, Paper, Typography } from "@mui/material";
-import ChatInput from "../ChatInput";
+import React, { useEffect, useState } from "react";
+import { Container, IconButton, Paper, Typography, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress } from "@mui/material";
 import './styles.css';
-import { useLocation } from "react-router-dom";
-import WebSocketContext from "../WebSocketContext";
-const {REACT_APP_API_BASE_URL}=process.env;
-
-function ChatMessage({ sender, message, send }) {
-  const isSentByCurrentUser = send;
-
-  const style = {
-    chatContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: isSentByCurrentUser ? 'flex-end' : 'flex-start',
-      marginBottom: '4px'
-    },
-    chatMessage: {
-      backgroundColor: '#f8f8f8',
-      border: '1px solid #ddd',
-      borderRadius: isSentByCurrentUser ? '25% 10%' : '10% 25%',
-      padding: '2px',
-      margin: '2px 0',
-      maxWidth: '400px',
-    },
-    senderAndReceiver: {
-      fontWeight: 'bold',
-      marginBottom: '5px',
-      fontSize: '12px'
-    },
-    messageContent: {
-      margin: '7px',
-    },
-  };
-
-  return (
-    <div style={style.chatContainer}>
-      <p style={style.senderAndReceiver}>Sender: {sender.senderName}</p>
-      <div style={style.chatMessage}>
-        <p style={style.messageContent}>{message.messageContent}</p>
-      </div>
-    </div>
-  );
-}
-
-
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import ChatIcon from '@mui/icons-material/Chat';
+import FriendProfile from "./FriendProfile";
+import MessageContent from "./MessageContent";
+import axios from "axios";
 
 
 // 聊天框部分
 function ChatBox(userInfo) {
-  const ws=useRef(null);
-  const [socket, setSocket]=useState();
-  const [message, setMessage]=useState([]);
-  const [friendInfo, setFriendInfo]=useState({});
-  const location=useLocation();
-
-
-  useEffect(()=>{
-    const senderId=userInfo._id;
-    const receiverId=location.pathname.split('/')[3];
-    ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${receiverId}`);
-    setSocket(ws.current);
-    
-    // 在组件卸载或者 WebSocket 的值改变时需要关闭它：
-    return () => {
-      ws.current && ws.current.close();
-      setMessage([]);
-    };
-  },[location.pathname, userInfo._id]);
-
-  useEffect(()=>{
-    const fetchMessage=async ()=>{
-      try{
-        socket.onmessage=function(event){
-          let receivedMessage=JSON.parse(event.data);
-          // 初始化数据
-          if(!receivedMessage.isNewMessage || receivedMessage.messages!==undefined) {
-            setFriendInfo(receivedMessage.friendInfo);
-            receivedMessage.messages.map((item)=>{
-              setMessage((prevMessage)=>{
-                return [...prevMessage, item];
-              });
-            });
-            console.log("received message.");
-          }
-          // 新消息
-          else {
-            console.log("received new message.");
-            setMessage((prevMessage)=>{
-              return [...prevMessage, receivedMessage];
-            })
-          }
-      }
-      } catch (err){
-        console.log(err);
-      }
-    };
-
-    if(socket){
-      fetchMessage();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isLoading, setIsLoading]=useState(true);
+  const [componentInfo, setComponentInfo] = useState({
+    senderId: '',
+    receiverId: '',
+    friendInfo: {
+      username: '',
+      self_intro: '',
+      gender: '',
+      profilePictureURL: ''
     }
-    
-  }, [socket]);
-  
+  });
+  const open = Boolean(anchorEl);
+  const location=useLocation();
+  const navigate=useNavigate();
 
+
+  useEffect(()=>{
+    const senderId = userInfo._id;
+    const receiverId = location.pathname.split('/')[3];
+    axios.post('/api/getFriendInfo', {friendId: receiverId})
+      .then((response)=>{
+        setComponentInfo({
+          senderId: senderId,
+          receiverId: receiverId,
+          friendInfo: {
+            username: response.data.username,
+            self_intro: response.data.self_intro,
+            gender: response.data.gender,
+            profilePictureURL: response.data.profilePictureURL
+          }
+        });
+        setIsLoading(false);
+      }).catch((err)=>{
+        console.log(err);
+      });
+  },[userInfo, location.pathname]);
+
+  const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
+  const closeFriendMenu=()=>setAnchorEl(null);
+
+  const toFriendInfo=()=>{
+    navigate('friendProfile');
+    closeFriendMenu();
+  }
+
+  const toChat=()=>{
+    navigate('');
+    closeFriendMenu();
+  }
+
+  if(isLoading){
+    return(<CircularProgress />)
+  }
 
   return (
-    <WebSocketContext.Provider value={ws.current}>
       <Container style={{ height: '100%' }}>
         <Paper className="chat-container">
+
           <div className="friend-name">
             <Typography variant="h6">
-              {friendInfo.username}
+              {componentInfo.username}
             </Typography>
-          </div>
-          {/* 聊天信息显示区域 */}
-          <div className="message-area">
-            {message ? message.map((item)=>{
-              item.send=false;
-              if(item.sender.senderName===userInfo.username)
-                item.send=true;
-            return <ChatMessage {...item} key={item._id} />   //这里的key是给react看的
-            }) : "Chat message goes here."}
+
+            <IconButton 
+              edge="end" 
+              aria-label="more" 
+              aria-controls={open ? 'friend-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={openFriendMenu} 
+              className="more-button">
+              <MoreVertIcon />
+            </IconButton>
+
+            <Menu
+              id="friend-menu" 
+              anchorEl={anchorEl}
+              open={open} 
+              onClose={closeFriendMenu}
+            >
+              <MenuItem onClick={toFriendInfo}>
+                <ListItemIcon>
+                  <PermIdentityIcon />
+                </ListItemIcon>
+                <ListItemText>Friend Info</ListItemText>
+              </MenuItem>
+
+              <MenuItem onClick={toChat}>
+                <ListItemIcon>
+                  <ChatIcon />
+                </ListItemIcon>
+                <ListItemText>Chat</ListItemText>
+              </MenuItem>
+            </Menu>
+
           </div>
 
-          {/* 输入框区域 */}
-          <ChatInput {...userInfo} />
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <MessageContent userInfo={userInfo} componentInfo={componentInfo}  />
+              } 
+            />
+
+            <Route
+              path="/friendProfile"
+              element={<FriendProfile componentInfo={componentInfo} />}
+            />
+          </Routes>
+
           </Paper>
       </Container>
-    </WebSocketContext.Provider>
   );
 }
 

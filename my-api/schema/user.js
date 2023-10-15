@@ -42,6 +42,22 @@ userSchema.pre('save', function(next) {
   }
 });
 
+// 在修改密码前
+userSchema.pre('findOneAndUpdate', function(next){
+  if(this._update.$set && this._update.$set.password) {
+    bcrypt.hash(this._update.$set.password, saltRounds, (err,hashedPassword)=>{
+      if(err){
+        return next(err);
+      }
+
+      this._update.$set.password=hashedPassword;
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
 
 /**
  * Create a Mongoose Model for a User using the userSchema.

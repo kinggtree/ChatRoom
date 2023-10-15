@@ -36,8 +36,6 @@ wss.on('connection', (ws, req)=>{
       }
     };
 
-    
-
     try{
       const messages=await Message.find({
         $or: [
@@ -91,6 +89,7 @@ wss.on('connection', (ws, req)=>{
     console.log("sended all messages from server!");
     ws.send(JSON.stringify(messageContent));
   };
+
   initMessage();
 
 

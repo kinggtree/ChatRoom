@@ -1,0 +1,5 @@
+.MuiTextField-root,
+.MuiSelect-root {
+  margin: 10px 0;
+  width: 100%;
+}

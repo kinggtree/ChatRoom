@@ -92,4 +92,16 @@ let messageContent={
 
 export EXPRESS_API_BASE_URL=......
 
+---
+
+### 8. getFriendProfile API 返回内容
+
+```
+let resData={
+  username: '',
+  self_intro: '',
+  gender: '',
+  profilePictureURL: ''
+}
+```
 

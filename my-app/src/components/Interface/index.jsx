@@ -54,7 +54,7 @@ function Interface(){
               element={<Chat {...userInfo}/>}
             />
             <Route
-              path="/profile"
+              path="/profile/*"
               element={<UserProfile updateInfo={updateInfo} />}
             />
           </Routes>

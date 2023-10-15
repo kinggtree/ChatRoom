@@ -42,7 +42,7 @@ function Chat(userInfo){
                 } 
               />
               <Route
-                path=":user_id"
+                path=":user_id/*"
                 element={<ChatBox {...userInfo} />} 
               />
             </Routes>

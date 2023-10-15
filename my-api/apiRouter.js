@@ -262,9 +262,23 @@ router.post('/unfriend',async function(req, res){
 router.post('/changeIntro', function(req, res){
   if(!req.session._id)
     return res.status(401).send();
+
+  let newGender='';
+
+  if(!req.body.gender)
+    newGender=req.session.gender;
+  else
+    newGender=req.body.gender;
+
+  let Intro='';
+  if(!req.body.newIntro)
+    Intro=req.session.self_intro;
+  else
+    Intro=req.body.newIntro;
+
   User.findOneAndUpdate(
     {_id: req.session._id},
-    {$set: {self_intro: req.body.newIntro}},
+    {$set: {self_intro: Intro, gender: newGender}},
     {new: false, useFindAndModify: true}
   ).then(()=>{
     res.status(200).send("finish editing");
@@ -273,6 +287,70 @@ router.post('/changeIntro', function(req, res){
     res.status(500).send("internal server error");
   });
 });
+
+
+// 更改密码
+router.post('/changePassword', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+
+  User.findOne({_id: req.session._id})
+    .then((user)=>{
+      if (!user) {
+        res.status(500).send("internal server error!");
+      } else {
+        bcrypt.compare(req.body.originalPassword, user.password, function(err, isMatch){
+          if(err){        // 对比器错误
+            res.status(500).send("internal server error!");
+          } else if(!isMatch){    // 旧密码不匹配
+            res.status(400).send('Original password wrong!');
+          } else {      // 修改密码
+            User.findOneAndUpdate(
+              {_id: req.session._id},
+              {$set: {password: req.body.newPassword}},
+              {new: false, useFindAndModify: true}
+            ).then(()=>{
+              res.status(200).send("change password success!");
+            }).catch((err)=>{
+              console.log(err);
+              res.status(500).send("internal server error!");
+            });
+          };
+        })
+        
+      };
+    }).catch((err)=>{
+      console.log(err);
+      res.status(500).send("internal server error!");
+    })
+})
+
+// 获得朋友档案
+router.post('/getFriendInfo', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+
+  const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+  
+  let resData={
+    username: '',
+    self_intro: '',
+    gender: '',
+    profilePictureURL: ''
+  }
+
+  User.findOne({_id: req.body.friendId})
+    .then((response)=>{
+      resData.username=response.username;
+      resData.self_intro=response.self_intro;
+      resData.gender=response.gender;
+      resData.profilePictureURL=URLPath+response.profilePictureName;
+      res.status(200).send(resData);
+    }).catch((err)=>{
+      console.log(err);
+      res.status(500).send("internal server error!");
+    });
+})
 
 
 module.exports = router;

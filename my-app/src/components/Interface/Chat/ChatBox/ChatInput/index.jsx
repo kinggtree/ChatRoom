@@ -2,7 +2,8 @@
 import React, { useContext, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { TextField, Button } from "@mui/material";
-import WebSocketContext from '../WebSocketContext'; 
+import WebSocketContext from '../../WebSocketContext'; 
+import SendIcon from '@mui/icons-material/Send';
 import "./styles.css";
 
 
@@ -63,7 +64,7 @@ function ChatInput(userInfo){
         value={content}
         className="input" 
       />
-      <Button variant="contained" onClick={handleSubmit} className="send" >Send</Button>
+      <Button variant="contained" onClick={handleSubmit} className="send" endIcon={<SendIcon />}>Send</Button>
     </div>
   );
 }

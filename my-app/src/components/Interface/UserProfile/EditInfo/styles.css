@@ -1,0 +1,14 @@
+.closeButton,
+.editButton {
+  margin: 10px;
+}
+
+.self-intro,
+.gender {
+  margin: 10px;
+  flex-direction: column;
+}
+
+.editButtonItem {
+  flex-direction: row-reverse;
+}
