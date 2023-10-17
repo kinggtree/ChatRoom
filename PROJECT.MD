@@ -26,7 +26,6 @@
 其中，contacts为一个数组，里面储存的是对象：
 ```
 {
-  contactUsername: req.session.username,
   contactId: req.session._id
 }
 ```
@@ -37,18 +36,17 @@
 ```
 {
   sender: {
-    senderName:'',
     senderId: new mongoose.Types.ObjectId('')
   },
   receiver:{
-    receiverName: '',
     receiverId: new mongoose.Types.ObjectId('')
   },
   message: {
     messageType: '',
     messageContent: ''
   },
-  date: new Date()
+  date: new Date(),
+  unread: Boolen(false)
 }
 ```
 
@@ -94,7 +92,7 @@ export EXPRESS_API_BASE_URL=......
 
 ---
 
-### 8. getFriendProfile API 返回内容
+### 8. getFriendInfo API 返回内容
 
 ```
 let resData={
@@ -104,4 +102,6 @@ let resData={
   profilePictureURL: ''
 }
 ```
+
+
 

@@ -24,7 +24,7 @@ function EditPwd(){
     
     axios.post('/api/changePassword', passwordSet)
       .then(()=>{
-        alert('finish reset password');
+        alert('修改密码成功！');
         setOriginalPassword('');
         setNewPassword('');
         setPwSec('');
@@ -40,7 +40,7 @@ function EditPwd(){
       <TextField 
        required 
        error={err} 
-       label="Original Password" 
+       label="旧密码" 
        type='password' 
        value={originalPassword}
        onChange={e=>setOriginalPassword(e.target.value)}
@@ -52,7 +52,7 @@ function EditPwd(){
       <TextField 
        required 
        error={err} 
-       label="New Password" 
+       label="新密码" 
        type='password' 
        value={newPassword}
        onChange={e=>setNewPassword(e.target.value)}
@@ -64,7 +64,7 @@ function EditPwd(){
       <TextField
       required 
       error={err} 
-      label="Type new password again" 
+      label="再次输入新密码" 
       type="password" 
       value={pwSec} 
       onChange={e=>setPwSec(e.target.value)}

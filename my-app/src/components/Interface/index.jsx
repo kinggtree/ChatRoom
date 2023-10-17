@@ -21,7 +21,7 @@ function Interface(){
       })
       .catch((err)=>{
         if(err.response.status===401){
-          alert("Not logged in yet.");
+          alert("请先登录！");
           navigate('/');
         } else {
           alert("err occurred: "+err);

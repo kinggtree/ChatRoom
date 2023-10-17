@@ -7,7 +7,8 @@ import { List,
     ListItemAvatar, 
     Avatar,
     Typography,
-    Toolbar
+    Toolbar,
+    CircularProgress
     } from "@mui/material";
 import DeleteIcon from'@mui/icons-material/Delete';
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
@@ -17,28 +18,37 @@ import './styles.css'
 // 每个联系人的组件
 function ContactsItem(item){
   const [friendInfo, setFriendInfo]=useState({});
-  const [picPath, setPicPath]=useState('');
+  const [isLoading, setIsLoading]=useState(true);
 
 
   useEffect(()=>{
-    setFriendInfo(item);
-    axios.post('/api/profilePictureURL', {contactId: item.contactId})
-      .then((response)=>{
-        setPicPath(response.data);
-      }).catch((err)=>{
-        console.log(err);
-      });
+    axios.post('/api/getFriendInfo', {friendId: item.contactId})
+    .then((response)=>{
+      setFriendInfo(response.data);
+      setIsLoading(false);
+    }).catch((err)=>{
+      console.log(err);
+    });
   },[]);
 
   const removeFriend=function(){
-      axios.post('/api/unfriend', friendInfo)
-      .then(()=>{
-          item.updateInfo();
-          alert('remove successfully!');
-      }).catch((err)=>{
-          console.log(err);
-      });
+    axios.post('/api/unfriend', {friendId: friendInfo._id})
+    .then(()=>{
+        item.updateInfo();
+        alert('remove successfully!');
+    }).catch((err)=>{
+        console.log(err);
+    });
+
   };
+
+  if(isLoading){
+    return (
+      <div>
+        <CircularProgress />
+      </div>
+    );
+  }
 
   return(
   <ListItem 
@@ -49,11 +59,11 @@ function ContactsItem(item){
   }>
     <ListItemAvatar>
       <Avatar
-        alt={'profile photo of '+item.contactUsername}
-        src={picPath}
+        alt={'profile photo of '+friendInfo.username}
+        src={friendInfo.profilePictureURL}
       />
     </ListItemAvatar>
-    <ListItemText primary={item.contactUsername} />
+    <ListItemText primary={friendInfo.username} />
   </ListItem>
   );
 };
@@ -61,11 +71,14 @@ function ContactsItem(item){
 
 
 function ManageContacts({contacts, updateInfo}){
-  const [currentContact, setCurrentContact]=useState([]);
   const [isSort, setIsSort]=useState(false);
+  const [isLoading, setIsLoading]=useState(true);
+  const [originalContact, setOriginalContact]=useState([]);
+  const [orderedContact, setOrderedContact]=useState([]);
+  const [usingContact, setUsingContact]=useState([]);
 
-  const sortContact=()=>{
-    const sortedContacts = contacts.slice().sort((a, b) => {
+  const sortContact=(newContacts)=>{
+    const sortedContacts = newContacts.slice().sort((a, b) => {
       if (a.contactUsername < b.contactUsername) {
         return -1;
       } else if (a.contactUsername > b.contactUsername) {
@@ -75,23 +88,62 @@ function ManageContacts({contacts, updateInfo}){
       }
     });
     
-    return sortedContacts;
+    setOrderedContact(sortedContacts);
+  }
+
+  const initContact=async ()=>{
+    try{
+      const promises = contacts.map((item)=>{
+        return axios.post('/api/getFriendName', {friendId: item.contactId})
+          .then((response)=>{
+              return {
+                'contactUsername': response.data,
+                'contactId': item.contactId
+              };
+            });
+      });
+
+      const results=await Promise.all(promises);
+
+      setOriginalContact(results);
+
+      setUsingContact(results);
+
+      sortContact(results);
+
+      setIsLoading(false);
+      
+      } catch(err) {
+      console.log(err);
+    }
   }
 
 
-  useEffect(()=>{
-    if(isSort){
-      setCurrentContact(sortContact);
-    } else {
-      setCurrentContact(contacts);
-    };
-  },[isSort]);
+// 专门处理初始化加载
+useEffect(() => {
+  if (isLoading) {
+      initContact();
+  }
+}, [isLoading]);
+
+// 处理排序状态的变化
+useEffect(() => {
+  if (isSort) {
+      setUsingContact(orderedContact);
+  } else {
+      setUsingContact(originalContact);
+  }
+}, [isSort]);
+
 
 
   const changeSort=()=>{
     setIsSort(!isSort);
   }
 
+  if(isLoading){
+    return <CircularProgress />
+  }
 
   return (
   <div>
@@ -102,7 +154,7 @@ function ManageContacts({contacts, updateInfo}){
       </IconButton>
     </Toolbar>
     <List component="nav" className="contacts">
-      {currentContact.map((item)=>{
+      {usingContact.map((item)=>{
         return <ContactsItem key={item.contactId} updateInfo={updateInfo} {...item} />
       })}
     </List>

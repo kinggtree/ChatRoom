@@ -45,7 +45,7 @@ const UserProfile = function({updateInfo}) {
       />
       <h1 className="username">{personalInfo.username}</h1>
       <Typography className="self-intro">{personalInfo.self_intro}</Typography>
-      <Typography className="gender"><strong>Gender: </strong>{personalInfo.gender}</Typography>
+      <Typography className="gender"><strong>性别: </strong>{personalInfo.gender}</Typography>
 
       <List component="nav" className="navigation">
         <ListItemButton component={Link} to={"editInfo"}>

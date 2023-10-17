@@ -6,7 +6,7 @@ import WebSocketContext from "./WebSocketContext";
 const {REACT_APP_API_BASE_URL}=process.env;
 
 
-function ChatMessage({ sender, message, send }) {
+function ChatMessage({ message, send, senderName }) {
   const isSentByCurrentUser = send;
 
   const style = {
@@ -36,7 +36,7 @@ function ChatMessage({ sender, message, send }) {
 
   return (
     <div style={style.chatContainer}>
-      <p style={style.senderAndReceiver}>Sender: {sender.senderName}</p>
+      <p style={style.senderAndReceiver}>{senderName}</p>
       <div style={style.chatMessage}>
         <p style={style.messageContent}>{message.messageContent}</p>
       </div>
@@ -108,10 +108,15 @@ function MessageContent({userInfo, componentInfo}) {
         <div className="message-area">
           {message ? message.map((item)=>{
             item.send=false;
-            if(item.sender.senderName===userInfo.username)
+            // 如果是我方发送
+            if(item.sender.senderId===userInfo._id)
+            {
               item.send=true;
-          return <ChatMessage {...item} key={item._id} />   //这里的key是给react看的
-          }) : "Chat message goes here."}
+              return <ChatMessage {...item} key={item._id} senderName={userInfo.username} />   //这里的key是给react看的
+            } else {
+              return <ChatMessage {...item} key={item._id} senderName={componentInfo.friendInfo.username} />   //这里的key是给react看的
+            };
+          }) : <p>还没有消息哦，发送点什么吧！</p>}
         </div>
 
         {/* 输入框区域 */}

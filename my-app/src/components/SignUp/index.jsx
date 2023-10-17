@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select, TextField, InputLabel, FormControl } from '@mui/material';
+import { Button, MenuItem, Select, TextField, InputLabel, FormControl, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,7 +28,7 @@ function SignUp(){
     axios.post('/api/signup', newUser)
       .then(response=>{
         if(response.status===200){
-          alert("Sign up successfully!");
+          alert("成功注册！");
           navigate('/');
         } else {
           alert(response.data);
@@ -43,13 +43,13 @@ function SignUp(){
       <TextField 
         required 
         value={username} 
-        label="User Name" 
+        label="请输入用户名" 
         onChange={e=>setUsername(e.target.value)}
       />
       <TextField 
        required 
        error={err} 
-       label="Password" 
+       label="请输入密码" 
        type='password' 
        value={password}
        onChange={e=>setPassword(e.target.value)}
@@ -57,34 +57,37 @@ function SignUp(){
       <TextField
       required 
       error={err} 
-      label="Type password again" 
+      label="请再次输入密码" 
       type="password" 
       value={pw_sec} 
       onChange={e=>setPw_sec(e.target.value)}
       />
       <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel id="gender-select-label">Gender</InputLabel>
+        <InputLabel id="gender-select-label">请选择性别</InputLabel>
         <Select
           labelId="gender-select" 
           value={gender} 
           label="Gender" 
           onChange={e=>setGender(e.target.value)}
         >
-          <MenuItem value={'male'}>Male</MenuItem>
-          <MenuItem value={'female'}>Female</MenuItem>
-          <MenuItem value={'gun-ship'}>Armed Helicopters</MenuItem>
+          <MenuItem value={'male'}>男</MenuItem>
+          <MenuItem value={'female'}>女</MenuItem>
+          <MenuItem value={'gun-ship'}>武装直升机</MenuItem>
         </Select>
       </FormControl>
       <TextField 
        required 
        error={err} 
-       label="Key" 
+       label="密钥" 
        type='text' 
        value={key}
        onChange={e=>setKey(e.target.value)}
       />
+      <Typography>
+        密钥请询问管理员
+      </Typography>
       <Button variant='contained' onClick={handleSubmit}>
-        Sign Up
+        注册
       </Button>
 
     </form>

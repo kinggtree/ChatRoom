@@ -14,7 +14,7 @@ function LogOut(){
     axios.post('/api/logout')
      .then((response)=>{
       if(response.status===200){
-        alert("Successfully logout!");
+        alert("成功退出登录！");
         navigate('/');
       } else {
         alert("err: "+response.data);
@@ -35,7 +35,7 @@ function LogOut(){
   return(
     <div>
       <Button className="logout-button" variant="contained" onClick={handleClick} color="error">
-        Log Out
+        退出登录
     </Button>
     <Menu
       id="confirm-logout"
@@ -44,7 +44,7 @@ function LogOut(){
       open={Boolean(anchorEl)}
       onClose={handleClose}
       >
-        <MenuItem onClick={handleLogout}>Sure?</MenuItem>
+        <MenuItem onClick={handleLogout}>确定？</MenuItem>
       </Menu>
     </div>
     

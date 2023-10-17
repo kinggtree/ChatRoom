@@ -28,12 +28,12 @@ wss.on('connection', (ws, req)=>{
   const initMessage=async ()=>{
 
     let messageContent={
-      'messages': [],
-      'friendInfo': {
-        'username':'',
-        'profilePictureURL':'',
-        'self_intro':''
-      }
+      'messages': []
+      // 'friendInfo': {
+      //   'username':'',
+      //   'profilePictureURL':'',
+      //   'self_intro':''
+      // }
     };
 
     try{
@@ -47,23 +47,25 @@ wss.on('connection', (ws, req)=>{
       //设置messageContent数据
       messages.map((item)=>{
         let tempMessage={
+          '_id':'',
           'sender':{
-            'senderName':'',
             'senderId':''
           },
           'receiver':{
-            'receiverName': '',
             'receiverId': ''
           },
           'message':{
             'messageType': '',
             'messageContent': ''
           },
-          'date':''
+          'date':'',
+          'unread': false
         };
-        tempMessage.sender.senderName=item.sender.senderName;
-        tempMessage.receiver=item.receiver;
+        tempMessage._id=item._id;
+        tempMessage.sender.senderId=item.sender.senderId;
+        tempMessage.receiver.receiverId=item.receiver.receiverId;
         tempMessage.message=item.message;
+        tempMessage.unread=item.unread;
         //tempMessage.date=item.date.date.toLocaleString();    //时间部分后面再说
         messageContent.messages.push(tempMessage);
       });
@@ -78,9 +80,9 @@ wss.on('connection', (ws, req)=>{
       });
 
       // 设置好友信息
-      messageContent.friendInfo.username=friend.username;
-      messageContent.friendInfo.profilePictureURL="http://localhost:5000/static/profile_photos/"+friend.profilePictureName;
-      messageContent.friendInfo.self_intro=friend.self_intro;
+      // messageContent.friendInfo.username=friend.username;
+      // messageContent.friendInfo.profilePictureURL="http://localhost:5000/static/profile_photos/"+friend.profilePictureName;
+      // messageContent.friendInfo.self_intro=friend.self_intro;
 
     } catch(err) {
       console.log("message cannot be saved!: ",err);
@@ -98,18 +100,15 @@ wss.on('connection', (ws, req)=>{
     try {
       Message.create({
         sender: {
-          senderName: messageObj.sender.senderName,
           senderId: new mongoose.Types.ObjectId(messageObj.sender.senderId)
         },
         receiver:{
-          receiverName: messageObj.receiver.receiverName,
           receiverId: new mongoose.Types.ObjectId(messageObj.receiver.receiverId)
         },
         message: {
           messageType: messageObj.message.type,
           messageContent: messageObj.message.content
-        },
-        date: new Date()
+        }
       });
     } catch (err) {
       console.log(err);

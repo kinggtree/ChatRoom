@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FriendBox from "./FriendBox";
 import Contacts from "./Contacts";
-import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box} from "@mui/material";
+import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box, Container} from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import './styles.css'
 
@@ -30,22 +30,24 @@ function Chat(userInfo){
           <div className="chat-interface">
             {/* 当屏幕宽度较小时，显示一个按钮来打开 Drawer */}
             {isMediumScreen && (
-              <Button onClick={handleDrawerToggle} variant='contained' className='show-contacts'>Show Contacts</Button>
+              <Button onClick={handleDrawerToggle} variant='contained' className='show-contacts'>展示联系人列表</Button>
             )}
             <Routes>
               <Route
                 path="/"
                 element={
-                  <Paper sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      height: '100px'
-                    }}>
-                    <Typography variant='h6'>
-                      Welcome to Chat Room!
-                    </Typography>
-                  </Paper>
+                  <Container>
+                    <Paper sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100px'
+                      }}>
+                      <Typography variant='h6' className=''>
+                        欢迎来到聊天室！
+                      </Typography>
+                    </Paper>
+                  </Container>
 
                 } 
               />

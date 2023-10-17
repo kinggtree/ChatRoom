@@ -37,12 +37,12 @@ function TopBar({ username, updateInfo }) {
   return (
     <Toolbar className="top-bar">
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
-        Welcome, user {username}.
+        欢迎，用户 {username}.
       </Typography>
 
       {/* Menu Button */}
       <Button className="menu-button" variant="contained" onClick={handleClick}>
-        Open Menu
+        菜单
       </Button>
       <Menu
         id="simple-menu"
@@ -51,9 +51,9 @@ function TopBar({ username, updateInfo }) {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={toChat}>Chat</MenuItem>
-        <MenuItem onClick={toProfile}>Personal Profile</MenuItem>
-        <MenuItem onClick={openAddFriend}>Add Friend</MenuItem>
+        <MenuItem onClick={toChat}>聊天</MenuItem>
+        <MenuItem onClick={toProfile}>个人信息</MenuItem>
+        <MenuItem onClick={openAddFriend}>添加好友</MenuItem>
       </Menu>
 
       <AddFriend updateInfo={updateInfo} isOpen={isAddFriendOpen} setIsOpen={setIsAddFriendOpen}/>

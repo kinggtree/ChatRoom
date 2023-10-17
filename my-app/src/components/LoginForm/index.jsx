@@ -18,7 +18,7 @@ function LoginForm() {
         axios.post('/api/login', jsonObj)
         .then(response=>{
             if(response.status===200){
-                alert("Login successsfully!");
+                alert("登录成功!");
                 navigate('/interface/chat');
             } else {
                 alert(response.data);
@@ -26,7 +26,7 @@ function LoginForm() {
                 setUsername('');
             };
         }).catch(err=>{
-            alert("Failed to log in due to "+err.response.data);
+            alert("无法登录： "+err.response.data);
         });
         //调用API，将username和password发送到服务器进行验证
     };
@@ -47,23 +47,23 @@ function LoginForm() {
         <form className="login-form">
             <TextField
                 required
-                label="User"
+                label="用户名"
                 value={username}
                 onChange={e=>setUsername(e.target.value)}
             />
             <TextField
                 required
-                label="Password"
+                label="密码"
                 type="password"
                 value={password}
                 onKeyDown={handleKeyDown}
                 onChange={e=>setPassword(e.target.value)}
             />
             <Button variant="contained" onClick={handleSubmit} className='login'>
-                Log in
+                登录
             </Button>
             <Button variant='outlined' onClick={toSignUp} className='signup'>
-                Sign Up
+                注册
             </Button>
         </form>
     );

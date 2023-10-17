@@ -1,32 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText } from '@mui/material';
+import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress } from '@mui/material';
 import './styles.css';
 import axios from 'axios';
 
 function ListButton(item) {
   let link=item.contactId;
 
-  const [picPath, setPicPath]=useState('');
+  const [friendInfo, setFriendInfo]=useState('');
+  const [isLoading, setIsLoading]=useState(true);
 
   useEffect(()=>{
-    axios.post('/api/profilePictureURL', {contactId: item.contactId})
+    axios.post('/api/getFriendInfo', {friendId: item.contactId})
      .then((response)=>{
-        setPicPath(response.data);
+        setFriendInfo(response.data);
+        setIsLoading(false);
      }).catch((err)=>{
       console.log(err);
      });
   }, []);
 
+  if(isLoading){
+    return(<CircularProgress />);
+  }
+
+
   return (
     <ListItemButton component={Link} to={link}>
       <ListItemAvatar>
         <Avatar
-          alt={'profile photo of '+item.contactUsername}
-          src={picPath}
+          alt={'profile photo of '+friendInfo.username}
+          src={friendInfo.profilePictureURL}
         />
       </ListItemAvatar>
-      <ListItemText primary={item.contactUsername} />
+      <ListItemText primary={friendInfo.username} />
     </ListItemButton>
   )
 }

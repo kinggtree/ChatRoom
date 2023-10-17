@@ -11,7 +11,7 @@ function AddFriend({updateInfo, isOpen, setIsOpen}) {
     axios.post('/api/newFriend', {friendName: friendName})
       .then(function(response){
         if(response.status===200){
-          alert("Add frined finished!");
+          alert("添加好友完成");
           updateInfo();
           setIsOpen(false);
           setFriendName('');

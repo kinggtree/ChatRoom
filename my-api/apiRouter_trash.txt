@@ -66,3 +66,27 @@ router.get('/profilePictureBinary', function(req, res){
     console.log(err);
   }
 });
+
+
+//获取指定用户头像-图片URL发送方法
+router.post('/profilePictureURL', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send("No session!");
+
+  try{
+    res.set('Cache-Control', 'no-store');
+    User.findOne({_id: req.body.contactId})
+      .then((response)=>{
+        const picName=response.profilePictureName;
+        const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+        res.status(200).send(URLPath+picName);
+
+      }).catch((err)=>{
+        res.status(500).send("internal server error!");
+        console.log(err);
+      });
+  } catch(err) {
+    res.status(500).send("internal server error!");
+    console.log(err);
+  }
+});

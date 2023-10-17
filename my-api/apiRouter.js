@@ -41,30 +41,30 @@ router.post('/signup', async function(req, res){
 
     let newUsername=req.body.newUsername;
 
+    let existUser=await User.findOne({username: newUsername});
 
-    User.findOne({username: newUsername})
-      .then(existUser=>{
-        if(existUser) {
-          return res.status(400).send("user already exists...");
-        }
+    if(existUser) {
+      return res.status(400).send("用户名已被使用...");
+    }
 
-        return User.create({
-          username: req.body.newUsername,
-          password: req.body.newPassword,
-          contacts: [],
-          profilePictureName: profilePicture,
-          self_intro: 'introduce to yourself!',
-          gender: req.body.gender
-        })
-      }).then((newUser)=>{
-      if(newUser)
-      {
-        return res.status(200).send("successfully register user.");
-      }
+
+    let newUser=User.create({
+      username: req.body.newUsername,
+      password: req.body.newPassword,
+      contacts: [],
+      profilePictureName: profilePicture,
+      self_intro: 'introduce to yourself!',
+      gender: req.body.gender
     });
+
+    if(newUser){
+      return res.status(200).send("成功注册新用户");
+    } else {
+      return res.status(500).send("internal server error");
+    }
   } catch(err){
     console.log(err);
-    return res.status(500).send("register error");
+    return res.status(500).send("internal server error");
   }
 
 });
@@ -111,7 +111,7 @@ router.post('/newFriend', async function(req, res) {
     // 找到对方的user信息
     const user = await User.findOne({username: req.body.friendName});
 
-    if(!user || user.contactUsername === '') {
+    if(!user || user.username === '') {         // 10.17 16:26 修改了这里
       return res.status(401).send("No such person.");
     };
 
@@ -125,25 +125,23 @@ router.post('/newFriend', async function(req, res) {
     }
     
     const newFriend = {
-      contactUsername: user.username,
       contactId: user._id,
     };
 
     const selfInfo={
-      contactUsername: req.session.username,
       contactId: req.session._id
     };
     
     // 将对方的User信息添加到自己的联系人中
     await User.findOneAndUpdate(
-      {username: req.session.username},
+      {_id: req.session._id},
       {$push: {contacts: newFriend}},
       {new: true, useFindAndModify: false}
     );
 
     // 将自己的信息添加到对方的通讯录中
     await User.findOneAndUpdate(
-      {username: newFriend.contactUsername},
+      {_id: newFriend.contactId},
       {$push: {contacts: selfInfo}},
       {new: true, useFindAndModify: false}
     );
@@ -171,7 +169,7 @@ router.post('/getUserInfo', function(req, res) {
     }).catch((err)=>{
       console.log(err);
       res.status(400).send(err.toString());
-    })
+    });
 });
 
 // 登出
@@ -185,28 +183,6 @@ router.post('/logout', function(req, res) {
   });
 });
 
-//获取指定用户头像-图片URL发送方法
-router.post('/profilePictureURL', function(req, res){
-  if(!req.session._id)
-    return res.status(401).send("No session!");
-
-  try{
-    res.set('Cache-Control', 'no-store');
-    User.findOne({_id: req.body.contactId})
-      .then((response)=>{
-        const picName=response.profilePictureName;
-        const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
-        res.status(200).send(URLPath+picName);
-
-      }).catch((err)=>{
-        res.status(500).send("internal server error!");
-        console.log(err);
-      });
-  } catch(err) {
-    res.status(500).send("internal server error!");
-    console.log(err);
-  }
-});
 
 // 获取用户个人档案
 router.post('/personalProfile', function(req, res) {
@@ -224,10 +200,11 @@ router.post('/personalProfile', function(req, res) {
       });
     }).catch((err)=>{
       console.log(err);
-      res.status(400).send(err.toString());
+      res.status(400).send("internal server error!");
     });
 });
 
+// 删除好友
 router.post('/unfriend',async function(req, res){
   if(!req.session._id)
     return res.status(401).send();
@@ -236,7 +213,7 @@ router.post('/unfriend',async function(req, res){
     // 删除我方的这个好友
     await User.findOneAndUpdate(
       {_id: req.session._id},
-      {$pull: {contacts: req.body}},
+      {$pull: {contacts: {contactId: req.body.friendId}}},      // 10.17 16:29 修改了这里
       {new: true, useFindAndModify: false}
     ).catch((err)=>{
       console.log(err);
@@ -244,7 +221,7 @@ router.post('/unfriend',async function(req, res){
 
     // 从对方联系人列表中删除自己
     await User.findOneAndUpdate(
-      {_id: req.body.contactId},
+      {_id: req.body.friendId},
       {$pull: {contacts: {contactId: req.session._id} } },
       {new: true, useFindAndModify: false}
     ).catch((err)=>{
@@ -259,16 +236,30 @@ router.post('/unfriend',async function(req, res){
 
 });
 
+
+// 改变个人信息
 router.post('/changeIntro', function(req, res){
   if(!req.session._id)
     return res.status(401).send();
 
   let newGender='';
+  let newUsername='';
+  let newIntro='';
 
-  if(!req.body.gender)
+  // 如果性别都为空的话则设置原来的值
+  if(req.body.gender==='')
     newGender=req.session.gender;
   else
     newGender=req.body.gender;
+
+  // 姓名为空设置默认
+  if(req.body.newUsername==='')
+    newUsername=req.session.username;
+  else
+    newUsername=req.body.newUsername;
+
+  // 个人介绍为空的设置见前端
+
 
   let Intro='';
   if(!req.body.newIntro)
@@ -278,7 +269,7 @@ router.post('/changeIntro', function(req, res){
 
   User.findOneAndUpdate(
     {_id: req.session._id},
-    {$set: {self_intro: Intro, gender: newGender}},
+    {$set: {username: newUsername, self_intro: Intro, gender: newGender}},
     {new: false, useFindAndModify: true}
   ).then(()=>{
     res.status(200).send("finish editing");
@@ -352,5 +343,19 @@ router.post('/getFriendInfo', function(req, res){
     });
 })
 
+
+// 管理联系人中仅获取联系人姓名
+router.post('/getFriendName', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+
+  User.findOne({_id: req.body.friendId})
+    .then((response)=>{
+      res.status(200).send(response.username);
+    }).catch((err)=>{
+      console.log(err);
+      res.status(500).send("internal server error!");
+    });
+})
 
 module.exports = router;

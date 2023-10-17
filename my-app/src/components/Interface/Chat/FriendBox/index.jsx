@@ -97,14 +97,14 @@ function FriendBox(userInfo) {
                 <ListItemIcon>
                   <PermIdentityIcon />
                 </ListItemIcon>
-                <ListItemText>Friend Info</ListItemText>
+                <ListItemText>好友信息</ListItemText>
               </MenuItem>
 
               <MenuItem onClick={toChat}>
                 <ListItemIcon>
                   <ChatIcon />
                 </ListItemIcon>
-                <ListItemText>Chat</ListItemText>
+                <ListItemText>聊天</ListItemText>
               </MenuItem>
             </Menu>
 

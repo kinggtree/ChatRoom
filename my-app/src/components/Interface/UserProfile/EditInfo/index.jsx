@@ -15,13 +15,19 @@ import './styles.css'
 // 更改自我介绍组件
 function EditInfo() {
   const [newIntro, setNewIntro]=useState('');
+  const [newUsername, setNewUsername]=useState('');
+
   const [gender, setGender]=useState('');
 
   const handleSubmit=function(e){
     e.preventDefault();
-    axios.post('/api/changeIntro', {newIntro: newIntro, gender: gender})
+
+    if(newIntro==='')
+      setNewIntro('');      // 设置这里为之前的个人介绍
+
+    axios.post('/api/changeIntro', {newUsername: newUsername,newIntro: newIntro, gender: gender})
       .then(()=>{
-        alert('finish edit!');
+        alert('修改成功！请重新登录以刷新');
       }).catch((err)=>{
         alert('cannot change!');
         console.log(err);
@@ -32,27 +38,35 @@ function EditInfo() {
     <div>
       <List>
       <ListItem className="self-intro">
+        <Typography>修改用户名</Typography>
+        <TextField
+          value={newUsername} 
+          onChange={e=>{setNewUsername(e.target.value)}} 
+          label='用户名'
+        />
+      </ListItem>
+      <ListItem className="self-intro">
         <Typography>修改自我介绍</Typography>
         <TextField
           value={newIntro} 
           onChange={e=>{setNewIntro(e.target.value)}} 
-          label='New Introduction'
+          label='自我介绍'
         />
       </ListItem>
 
       <ListItem className="gender">
         <Typography>修改性别</Typography>
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="gender-select-label">Gender</InputLabel>
+          <InputLabel id="gender-select-label">请选择</InputLabel>
           <Select
             labelId="gender-select" 
             value={gender} 
             label="Gender" 
             onChange={e=>setGender(e.target.value)}
           >
-            <MenuItem value={'male'}>Male</MenuItem>
-            <MenuItem value={'female'}>Female</MenuItem>
-            <MenuItem value={'gun-ship'}>Armed Helicopters</MenuItem>
+            <MenuItem value={'male'}>男</MenuItem>
+            <MenuItem value={'female'}>女</MenuItem>
+            <MenuItem value={'gun-ship'}>武装直升机</MenuItem>
           </Select>
         </FormControl>
       </ListItem>

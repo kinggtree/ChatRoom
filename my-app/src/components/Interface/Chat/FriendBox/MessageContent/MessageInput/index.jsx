@@ -18,15 +18,12 @@ function MessageInput(userInfo){
       return alert('text cannot be null.');
 
     const receiverId=location.pathname.split('/')[3];
-    const receiverName=userInfo.contacts.find(array=>array.contactId===receiverId).contactUsername;
 
     const message={
       sender: {
-        senderName: userInfo.username,
         senderId: userInfo._id
       },
       receiver:{
-        receiverName: receiverName,
         receiverId: receiverId
       },
       message:{
