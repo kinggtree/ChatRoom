@@ -2,6 +2,8 @@
 
 这是一个使用React和Express开发的前后端分离的聊天室项目，项目开发模式为JavaScript全栈开发
 
+# 尚未完成路由拆分，详情见apiRouter.js
+
 ## 💻 技术栈
 
 - 前端：React
