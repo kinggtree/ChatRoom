@@ -1,37 +1,71 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress } from '@mui/material';
+import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
 import './styles.css';
 import axios from 'axios';
 
-function ListButton(item) {
-  let link=item.contactId;
+function ListButton({contactId, userId}) {
+  let link=contactId;
 
   const [friendInfo, setFriendInfo]=useState('');
   const [isLoading, setIsLoading]=useState(true);
+  const [isUnread, setIsUnread]=useState(false);
+
+
+  const initItem=async ()=>{
+    try{
+      const [friendInfoResponse, unreadResponse]=await Promise.all([
+        axios.post('/api/getFriendInfo',{friendId: contactId}),
+        axios.post('/api/getUnread', {
+          receiverId: userId,
+          senderId: contactId
+        })
+      ]);
+
+      if(unreadResponse.data.unread===undefined) {
+        setIsUnread(false);
+      } else {
+        setIsUnread(unreadResponse.data.unread);
+      }
+
+      setFriendInfo(friendInfoResponse.data);
+      setIsLoading(false);
+    } catch (err){
+      console.log(err);
+    }
+  };
+
 
   useEffect(()=>{
-    axios.post('/api/getFriendInfo', {friendId: item.contactId})
-     .then((response)=>{
-        setFriendInfo(response.data);
-        setIsLoading(false);
-     }).catch((err)=>{
-      console.log(err);
-     });
+    initItem();
   }, []);
 
+
+
+
   if(isLoading){
-    return(<CircularProgress />);
+    return(
+    <div>
+      <CircularProgress />
+    </div>
+);
   }
 
 
   return (
-    <ListItemButton component={Link} to={link}>
+    <ListItemButton component={Link} to={link} onClick={e=>setIsUnread(false)}>
       <ListItemAvatar>
-        <Avatar
-          alt={'profile photo of '+friendInfo.username}
-          src={friendInfo.profilePictureURL}
-        />
+        <Badge
+        color="error"
+        variant="dot"
+        overlap="circular"
+        invisible={!isUnread}
+        >
+          <Avatar
+            alt={'profile photo of '+friendInfo.username}
+            src={friendInfo.profilePictureURL}
+          />
+        </Badge>
       </ListItemAvatar>
       <ListItemText primary={friendInfo.username} />
     </ListItemButton>
@@ -50,7 +84,7 @@ function Contacts(userInfo) {
   return (
     <List component="nav" className="nav-list">
       {contacts.map((item)=>{
-        return <ListButton key={item.contactId} {...item} className="nav-list-item" />
+        return <ListButton key={item.contactId} {...item} userId={userInfo._id} className="nav-list-item" />
       })}
     </List>
   )

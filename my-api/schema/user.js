@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   profilePictureName: String,
   self_intro: String,
   gender: String,
+  like: {type: Number, default: 0},
   contacts: [
     {
       _id: false,

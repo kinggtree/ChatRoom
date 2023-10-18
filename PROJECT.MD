@@ -52,14 +52,15 @@
 
 ---
 
-#### 4. 个人信息包含：
+#### 4. personalProfile API 返回数据包含：
 ```
 {
   'username': req.session.username,
   'profilePictureURL': "http://localhost:5000/static/profile_photos/"+response.profilePictureName,
   'self_intro': response.self_intro,
   'gender': response.gender,
-  'contacts': response.contacts
+  'contacts': response.contacts,
+  'like': response.like
 }
 ```
 由personalProfile调用，在个人主页 UserProfile 中使用
@@ -95,6 +96,7 @@ export EXPRESS_API_BASE_URL=......
 
 ```
 let resData={
+  _id: '',
   username: '',
   self_intro: '',
   gender: '',
@@ -102,5 +104,19 @@ let resData={
 }
 ```
 
+---
 
+### 9. getUnread API 
+
+发送内容
+
+```
+{'sender.senderId': req.body.receiverId, 'receiver.receiverId': req.body.senderId}
+```
+
+返回内容
+
+```
+{unread: true}
+```
 

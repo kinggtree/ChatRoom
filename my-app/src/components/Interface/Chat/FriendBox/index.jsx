@@ -38,17 +38,19 @@ function FriendBox(userInfo) {
           senderId: senderId,
           receiverId: receiverId,
           friendInfo: {
+            _id: response.data._id,
             username: response.data.username,
             self_intro: response.data.self_intro,
             gender: response.data.gender,
-            profilePictureURL: response.data.profilePictureURL
+            profilePictureURL: response.data.profilePictureURL,
+            like: response.data.like
           }
         });
         setIsLoading(false);
       }).catch((err)=>{
         console.log(err);
       });
-  },[userInfo, location.pathname]);
+  },[userInfo._id, location.pathname]);
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeFriendMenu=()=>setAnchorEl(null);

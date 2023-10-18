@@ -44,6 +44,7 @@ const UserProfile = function({updateInfo}) {
           className="profile-picture" 
       />
       <h1 className="username">{personalInfo.username}</h1>
+      <p> 点赞数: {personalInfo.like}</p>
       <Typography className="self-intro">{personalInfo.self_intro}</Typography>
       <Typography className="gender"><strong>性别: </strong>{personalInfo.gender}</Typography>
 

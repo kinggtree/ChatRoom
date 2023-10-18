@@ -3,6 +3,7 @@ import { Container } from "@mui/material";
 import MessageInput from "./MessageInput";
 import './styles.css';
 import WebSocketContext from "./WebSocketContext";
+import axios from "axios";
 const {REACT_APP_API_BASE_URL}=process.env;
 
 
@@ -58,45 +59,59 @@ function MessageContent({userInfo, componentInfo}) {
     const senderId=componentInfo.senderId;
     const receiverId=componentInfo.receiverId;
     ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${receiverId}`);
-    setSocket(ws.current);
+
+    ws.current.onerror=(error)=>{
+      console.log(error);
+    }
+
+    ws.current.onopen=()=>{
+      setSocket(ws.current);
+    }
     
     // 在组件卸载或者 WebSocket 的值改变时需要关闭它：
     return () => {
       ws.current && ws.current.close();
       setMessage([]);
     };
-  },[]);
+  },[componentInfo.receiverId]);
 
-  useEffect(()=>{
-    const fetchMessage=async ()=>{
-      try{
-        socket.onmessage=function(event){
-          let receivedMessage=JSON.parse(event.data);
-          // 初始化数据
-          if(!receivedMessage.isNewMessage || receivedMessage.messages!==undefined) {
-            receivedMessage.messages.map((item)=>{
-              setMessage((prevMessage)=>{
-                return [...prevMessage, item];
-              });
-            });
-            console.log("received message.");
+
+  useEffect(() => {
+    const fetchMessage = async () => {
+      try {
+        socket.onmessage = function(event) {
+          const receivedMessage = JSON.parse(event.data);
+          let newMessages = [];
+
+          if (receivedMessage.messages) {
+            newMessages = receivedMessage.messages;
+          } else {
+            newMessages = [receivedMessage];
           }
-          // 新消息
-          else {
-            console.log("received new message.");
-            setMessage((prevMessage)=>{
-              return [...prevMessage, receivedMessage];
-            })
+
+          setMessage(prevMessage => [...prevMessage, ...newMessages]);
+
+          // 收集未读消息的ID
+          // filter用来选择接收方是自己的消息
+          const unreadMessageIds = newMessages
+            .filter(m => ((m.receiver.receiverId===userInfo._id) && m.unread))
+            .map(m => m._id);
+
+          // 如果有未读消息，发送请求标记它们为已读
+          if (unreadMessageIds.length > 0) {
+              axios.post('/api/setIsRead', { messageIds: unreadMessageIds });
           }
-      }
-      } catch (err){
+        };
+      } catch (err) {
         console.log(err);
       }
     };
-    if(socket){
+
+    if (socket) {
       fetchMessage();
     }
-  }, [socket]);
+}, [socket]);
+
 
 
 
@@ -106,16 +121,10 @@ function MessageContent({userInfo, componentInfo}) {
         <div className="message-container">
 
         <div className="message-area">
-          {message ? message.map((item)=>{
-            item.send=false;
-            // 如果是我方发送
-            if(item.sender.senderId===userInfo._id)
-            {
-              item.send=true;
-              return <ChatMessage {...item} key={item._id} senderName={userInfo.username} />   //这里的key是给react看的
-            } else {
-              return <ChatMessage {...item} key={item._id} senderName={componentInfo.friendInfo.username} />   //这里的key是给react看的
-            };
+          {message.length!==0 ? message.map((item)=>{
+            const isSentByCurrentUser=item.sender.senderId===userInfo._id;
+            const senderName=isSentByCurrentUser ? userInfo.username : componentInfo.friendInfo.username;
+            return <ChatMessage {...item} send={isSentByCurrentUser} key={item._id} senderName={senderName} />
           }) : <p>还没有消息哦，发送点什么吧！</p>}
         </div>
 

@@ -8,7 +8,6 @@ mongoose.connect("mongodb://127.0.0.1/ChatRoom", {
   useUnifiedTopology: true,
 })
 const Message=require("./schema/message");
-const User=require("./schema/user");
 const changeStream=Message.watch();
 
 
@@ -29,11 +28,6 @@ wss.on('connection', (ws, req)=>{
 
     let messageContent={
       'messages': []
-      // 'friendInfo': {
-      //   'username':'',
-      //   'profilePictureURL':'',
-      //   'self_intro':''
-      // }
     };
 
     try{
@@ -74,20 +68,6 @@ wss.on('connection', (ws, req)=>{
       ws.send('error, message cannot be saved!');
     };
 
-    try{
-      const friend=await User.findOne({
-        _id: receiverId
-      });
-
-      // 设置好友信息
-      // messageContent.friendInfo.username=friend.username;
-      // messageContent.friendInfo.profilePictureURL="http://localhost:5000/static/profile_photos/"+friend.profilePictureName;
-      // messageContent.friendInfo.self_intro=friend.self_intro;
-
-    } catch(err) {
-      console.log("message cannot be saved!: ",err);
-      ws.send('error, friendInfo cannot be saved!');
-    };
     console.log("sended all messages from server!");
     ws.send(JSON.stringify(messageContent));
   };
@@ -130,7 +110,7 @@ wss.on('connection', (ws, req)=>{
         ws.send(JSON.stringify(newMessage));
       }
     }
-  })
+  });
 
   // 关闭连接
   ws.on('close', () => {
