@@ -93,14 +93,12 @@ function ManageContacts({contacts, updateInfo}){
 
   const initContact=async ()=>{
     try{
-      const promises = contacts.map((item)=>{
-        return axios.post('/api/getFriendName', {friendId: item.contactId})
-          .then((response)=>{
-              return {
-                'contactUsername': response.data,
-                'contactId': item.contactId
-              };
-            });
+      const promises = contacts.map(async (item)=>{
+        const response = await axios.post('/api/getFriendName', { friendId: item.contactId });
+        return {
+          'contactUsername': response.data,
+          'contactId': item.contactId
+        };
       });
 
       const results=await Promise.all(promises);

@@ -1,4 +1,4 @@
-# 部分变量格式详情
+# 部分变量及API格式详情
 
 #### 1. 数据库中users的储存格式：
 ```
@@ -62,7 +62,7 @@
   'contacts': response.contacts
 }
 ```
-由personalProfile调用
+由personalProfile调用，在个人主页 UserProfile 中使用
 
 ---
 
@@ -70,7 +70,6 @@
 ```
 let messageContent={
   'message': {},
-  'friendInfo': {}
 };
 ```
 

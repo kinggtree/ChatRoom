@@ -1,6 +1,52 @@
-### 🚀 一个简单的聊天室软件
+# 🚀 一个较为简单的聊天室项目
 
-🔍 **代码说明**
+这是一个使用React和Express开发的前后端分离的聊天室项目，项目开发模式为JavaScript全栈开发
+
+## 💻 技术栈
+
+- 前端：React
+- 后端：Express
+
+
+## 🔬 项目结构
+
+```
+├── how_2_deploy
+├── my-api
+│   ├── bin
+│   ├── schema
+│   ├── static
+│   │   └── profile_photos
+│   └── views
+└── my-app
+    ├── build
+    │   └── static
+    │       ├── css
+    │       └── js
+    ├── public
+    └── src
+        └── components
+            ├── Interface
+            │   ├── Chat
+            │   │   ├── Contacts
+            │   │   └── FriendBox
+            │   │       ├── FriendProfile
+            │   │       └── MessageContent
+            │   │           ├── MessageInput
+            │   │           └── WebSocketContext
+            │   ├── TopBar
+            │   │   ├── AddFriend
+            │   │   └── LogOut
+            │   └── UserProfile
+            │       ├── EditInfo
+            │       ├── EditPwd
+            │       └── ManageContacts
+            ├── LoginForm
+            └── SignUp
+```
+
+
+🔍 **关键文件/文件夹说明**
 - /my-api 后端代码 / 服务器
 - /my-app 前端代码 / 服务器
 - /my-api/key.txt 保存了服务器每整点自动刷新的密钥，用于登录
@@ -10,10 +56,16 @@
 - startDB.sh 需要在管理员权限下启动的，一键启动所有数据库副本集的脚本
 - terminateDB.sh 同上，只不过用来终止数据库
 
+## 💾 安装与运行
 
-🛠 **已知问题**
-1. **验证问题**：项目基于`session`来验证权限，或许基于`cookie`的方法会更佳。
-2. **更新显示问题**: 好友的新加入和删除无法触发页面和组件的刷新
-3. **没有参数配置**: 以下参数无法简单配置：数据库名称，服务器端口
-3. **安全性问题**: 未使用HTTPS（涉及到SSL根证书，暂时无法配置）
+见how_2_deploy文件夹
+
+
+## 📝 开发日志
+
+见LOGS.MD文件
+
+## 🔌 API/技术文档
+
+见PROJECT.MD
 
