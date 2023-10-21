@@ -1,38 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
 import './styles.css';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { messageRead } from '../../../../reduxSlice/unreadContactSlice';
 
 
-function ListButton({_id, username, profilePictureURL, isNewMessage }) {
+function ListButton({_id, username, profilePictureURL, unreadNum }) {
   const contactId=_id;
   let link=contactId;
 
+  console.log(useSelector(state=>state.unreadContact));
 
-  const [isLoading, setIsLoading]=useState(true);
-  const [isUnread, setIsUnread]=useState(false);
-
-
-  useEffect(()=>{
-    setIsUnread(isNewMessage);
-    setIsLoading(false);
-  }, []);
-
-
-
-  if(isLoading){
-    return(
-    <div>
-      <CircularProgress />
-    </div>
-    );
-  }
+  const isUnread = unreadNum && unreadNum > 0; // 如果unreadNum存在且大于0，则为true，否则为false
+  const dispatch=useDispatch();
 
 
   return (
-    <ListItemButton component={Link} to={link} onClick={e=>setIsUnread(false)}>
+    <ListItemButton component={Link} to={link} onClick={()=>dispatch(messageRead(contactId))}>
       <ListItemAvatar>
         <Badge
         color="error"
@@ -54,12 +40,17 @@ function ListButton({_id, username, profilePictureURL, isNewMessage }) {
 
 function Contacts() {
   const fullContact=useSelector(state=>state.fullContact.item);
+  const unreadContact=useSelector(state=>state.unreadContact);
+  const contactStatus=useSelector(state=>state.fullContact.status);
 
+  if(contactStatus!=='succeeded'){
+    return <CircularProgress />
+  }
 
   return (
     <List component="nav" className="nav-list">
       {fullContact.map((item)=>{
-        return <ListButton key={item._id} {...item} className="nav-list-item" />
+        return <ListButton key={item._id} {...item} unreadNum={unreadContact[item._id]} className="nav-list-item" />
       })}
     </List>
   )

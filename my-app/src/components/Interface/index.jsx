@@ -8,6 +8,7 @@ import { CircularProgress, Grid } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserInfo } from "../../reduxActions/userInfoActions";
 import { fetchFullContact } from "../../reduxActions/fullContactActions";
+import { newMessageReceived } from "../../reduxSlice/unreadContactSlice";
 
 function Interface(){
 
@@ -18,10 +19,16 @@ function Interface(){
   const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
   const [isLoading ,setIsLoading]=useState(true);
 
+  
 
   useEffect(()=>{
     dispatch(fetchUserInfo());
-  }, []); // 该组件在dispatch变化时重新渲染
+
+    dispatch({ type: 'START_SSE_CONNECTION' });
+
+    //当不再渲染的时候关闭连接
+
+  }, [dispatch]); // 该组件在dispatch变化时重新渲染
 
   useEffect(()=>{
     if(userInfoStatus==='succeeded'){

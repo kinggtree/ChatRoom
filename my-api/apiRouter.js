@@ -426,38 +426,71 @@ router.post('/like', function(req, res){
 });
 
 
-// 未来可以实现由客户端主动发送未读提示
-router.post('/serverSendNew', function(req, res) {
+// 由服务器主动发送未读提示
+router.get('/serverSendNew', async function(req, res) {
+  if (!req.session._id) {
+    return res.status(401).send('Unauthorized');
+  }
+
   // 设置SSE相关的头部信息
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
 
-  // 获取传入的senderIds数组
-  const senderIds = req.body.senderIds.map(id => id.toString());
+  const userId = req.session._id;
 
-  const changeStream = Message.watch();
+  try {
+    // 获取初始化的所有未读消息数量
+    const unreadMessages = await Message.find({
+      'receiver.receiverId': userId,
+      unread: true
+    });
 
-  changeStream.on('change', (change) => {
-    if (change.operationType === 'insert') {
-      const newMessage = change.fullDocument;
-      // 检查消息的发送者是否在我们的senderIds数组中
-      if (senderIds.includes(newMessage.sender.senderId.toString())) {
-        // 发送senderId和消息内容
-        res.write(`data: ${JSON.stringify({ senderId: newMessage.sender.senderId, message: newMessage.content })}\n\n`);
-      }
+    // 发送初始化数据到前端
+    for (const msg of unreadMessages) {
+      console.log("senderId: "+msg.sender.senderId.toString());     // 要发送的未读消息到前端
+      res.write(`data: ${JSON.stringify({ 
+        senderId: msg.sender.senderId
+      })}\n\n`);
     }
-  });
 
-  changeStream.on('error', (error) => {
-    console.error("Error in changeStream:", error);
-    res.status(500).end();
-  });
+    // 使用$match来过滤变更
+    const pipeline = [
+      {
+        $match: {
+          "fullDocument.sender.senderId": userId        // 监听自己发送出去的消息
+        }
+      }
+    ];
 
-  res.on('close', () => {
-    changeStream.close();
-  });
+    const changeStream = Message.watch(pipeline);
+
+    changeStream.on('change', (change) => {
+      if (change.operationType === 'insert') {
+        const newMessage = change.fullDocument;
+        console.log(newMessage);      // 理论上来说现在监听的是自己发送出去的消息
+        res.write(`data: ${JSON.stringify({ 
+          senderId: newMessage.sender.senderId 
+        })}\n\n`);
+      }
+    });
+
+    // 心跳检查
+    setInterval(() => {
+      res.write(':heartbeat\n\n');
+      console.log("heartbeat!");
+    }, 15000);
+
+    res.on('close', () => {
+      changeStream.close();
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send('Internal Server Error');
+  }
 });
+
 
 // 通过传入的联系人ID，获取所有联系人的全部信息
 router.post('/fullContact', function(req, res){
