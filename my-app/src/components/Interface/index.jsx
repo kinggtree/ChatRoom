@@ -4,39 +4,29 @@ import TopBar from "./TopBar";
 import UserProfile from "./UserProfile";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { CircularProgress, Grid } from "@mui/material";
-import axios from "axios";
+
+import { useDispatch, useSelector } from 'react-redux';
+import {fetchUserInfo} from './actions';
 
 function Interface(){
 
-  const[userInfo, setUserInfo]=useState({});
-  const[loading, setLoading]=useState(true);
-  const[reRender, setReRender]=useState(false);
   const navigate = useNavigate();
 
+  const dispatch=useDispatch();
+  const status=useSelector(state=>state.userInfo.status);
+
+
   useEffect(()=>{
-    axios.post('/api/getUserInfo')
-      .then((response)=>{
-        setUserInfo(response.data);
-        setLoading(false);
-      })
-      .catch((err)=>{
-        if(err.response.status===401){
-          alert("请先登录！");
-          navigate('/');
-        } else {
-          alert("err occurred: "+err);
-          navigate('/');
-          setLoading(false);
-        }
-      });
-  }, [reRender]); // 该组件在reRender变化时重新渲染
+    dispatch(fetchUserInfo());
+  }, [dispatch]); // 该组件在dispatch变化时重新渲染
 
-  const updateInfo=()=>{
-    setReRender(!reRender);
-  }
-
-  if(loading) {
+  if(status!=='succeeded') {
     return <CircularProgress />
+  }
+  if(status==='failed'){
+    alert("出现错误，请重新登录")
+    navigate('/');
+    return;
   }
 
   return(
@@ -44,23 +34,24 @@ function Interface(){
       <Grid container spacing={2}>
 
         <Grid item sm={12}>
-          <TopBar {...userInfo} updateInfo={updateInfo} />
+          <TopBar />
         </Grid>
 
         <Grid item sm={12}>
           <Routes>
             <Route
               path="/chat/*"
-              element={<Chat {...userInfo}/>}
+              element={<Chat />}
             />
             <Route
               path="/profile/*"
-              element={<UserProfile updateInfo={updateInfo} />}
+              element={<UserProfile />}
             />
           </Routes>
         </Grid>
 
       </Grid>
+
     </div>
     
   );

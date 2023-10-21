@@ -13,6 +13,7 @@ import { List,
 import DeleteIcon from'@mui/icons-material/Delete';
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import './styles.css'
+import { useSelector } from "react-redux";
 
 
 // 每个联系人的组件
@@ -22,7 +23,7 @@ function ContactsItem(item){
 
 
   useEffect(()=>{
-    axios.post('/api/getFriendInfo', {friendId: item.contactId})
+    axios.post('/api/getFriendBoxInfo', {friendId: item.contactId})
     .then((response)=>{
       setFriendInfo(response.data);
       setIsLoading(false);
@@ -34,7 +35,6 @@ function ContactsItem(item){
   const removeFriend=function(){
     axios.post('/api/unfriend', {friendId: friendInfo._id})
     .then(()=>{
-        item.updateInfo();
         alert('remove successfully!');
     }).catch((err)=>{
         console.log(err);
@@ -70,12 +70,14 @@ function ContactsItem(item){
 
 
 
-function ManageContacts({contacts, updateInfo}){
+function ManageContacts(){
   const [isSort, setIsSort]=useState(false);
   const [isLoading, setIsLoading]=useState(true);
   const [originalContact, setOriginalContact]=useState([]);
   const [orderedContact, setOrderedContact]=useState([]);
   const [usingContact, setUsingContact]=useState([]);
+
+  const contacts=useSelector(state=>state.userInfo.item.contacts);
 
   const sortContact=(newContacts)=>{
     const sortedContacts = newContacts.slice().sort((a, b) => {
@@ -120,16 +122,16 @@ function ManageContacts({contacts, updateInfo}){
 // 专门处理初始化加载
 useEffect(() => {
   if (isLoading) {
-      initContact();
+    initContact();
   }
 }, [isLoading]);
 
 // 处理排序状态的变化
 useEffect(() => {
   if (isSort) {
-      setUsingContact(orderedContact);
+    setUsingContact(orderedContact);
   } else {
-      setUsingContact(originalContact);
+    setUsingContact(originalContact);
   }
 }, [isSort]);
 
@@ -153,7 +155,7 @@ useEffect(() => {
     </Toolbar>
     <List component="nav" className="contacts">
       {usingContact.map((item)=>{
-        return <ContactsItem key={item.contactId} updateInfo={updateInfo} {...item} />
+        return <ContactsItem key={item.contactId} {...item} />
       })}
     </List>
   </div>

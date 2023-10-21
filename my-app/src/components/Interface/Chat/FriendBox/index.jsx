@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Container, IconButton, Paper, Typography, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress, Toolbar } from "@mui/material";
-import './styles.css';
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+
+import { Container, IconButton, Paper, Typography, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress, Toolbar } from "@mui/material";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import ChatIcon from '@mui/icons-material/Chat';
+
 import FriendProfile from "./FriendProfile";
 import MessageContent from "./MessageContent";
-import axios from "axios";
+
+import { useSelector, useDispatch } from "react-redux";
+import { fetchFriendBoxInfo } from "./actions";
+
+import './styles.css';
 
 
 // 聊天框部分
-function FriendBox(userInfo) {
+function FriendBox() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoading, setIsLoading]=useState(true);
   const [componentInfo, setComponentInfo] = useState({
@@ -28,28 +33,23 @@ function FriendBox(userInfo) {
   const location=useLocation();
   const navigate=useNavigate();
 
+  const dispatch=useDispatch();
+  const userInfo=useSelector(state=>state.userInfo.item);
+  const friendBoxInfo=useSelector(state=>state.friendBoxInfo.item);
+
 
   useEffect(()=>{
     const senderId = userInfo._id;
     const receiverId = location.pathname.split('/')[3];
-    axios.post('/api/getFriendInfo', {friendId: receiverId})
-      .then((response)=>{
-        setComponentInfo({
-          senderId: senderId,
-          receiverId: receiverId,
-          friendInfo: {
-            _id: response.data._id,
-            username: response.data.username,
-            self_intro: response.data.self_intro,
-            gender: response.data.gender,
-            profilePictureURL: response.data.profilePictureURL,
-            like: response.data.like
-          }
-        });
-        setIsLoading(false);
-      }).catch((err)=>{
-        console.log(err);
-      });
+
+    dispatch(fetchFriendBoxInfo(receiverId));
+
+    setComponentInfo({
+      senderId: senderId,
+      receiverId: receiverId,
+      friendInfo: friendBoxInfo
+    });
+    setIsLoading(false);
   },[userInfo._id, location.pathname]);
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
@@ -116,7 +116,7 @@ function FriendBox(userInfo) {
             <Route
               path="/*"
               element={
-                <MessageContent userInfo={userInfo} componentInfo={componentInfo}  />
+                <MessageContent componentInfo={componentInfo}  />
               } 
             />
 

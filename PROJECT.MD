@@ -92,7 +92,7 @@ export EXPRESS_API_BASE_URL=......
 
 ---
 
-### 8. getFriendInfo API 返回内容
+### 8. getFriendBoxInfo API 返回内容
 
 ```
 let resData={
@@ -100,7 +100,8 @@ let resData={
   username: '',
   self_intro: '',
   gender: '',
-  profilePictureURL: ''
+  profilePictureURL: '',
+  like: 0
 }
 ```
 

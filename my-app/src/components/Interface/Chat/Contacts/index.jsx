@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
+import {  useSelector } from 'react-redux';
 import './styles.css';
 import axios from 'axios';
 
@@ -15,7 +16,7 @@ function ListButton({contactId, userId}) {
   const initItem=async ()=>{
     try{
       const [friendInfoResponse, unreadResponse]=await Promise.all([
-        axios.post('/api/getFriendInfo',{friendId: contactId}),
+        axios.post('/api/getFriendBoxInfo',{friendId: contactId}),
         axios.post('/api/getUnread', {
           receiverId: userId,
           senderId: contactId
@@ -73,17 +74,12 @@ function ListButton({contactId, userId}) {
 }
 
 // 传入的是userInfo，从中获得contacts
-function Contacts(userInfo) {
-  const [contacts, setContacts]=useState([]);
-
-  //get contacts list
-  useEffect(()=>{
-    setContacts(userInfo.contacts); 
-  }, []);
+function Contacts() {
+  const userInfo=useSelector(state=>state.userInfo.item);
 
   return (
     <List component="nav" className="nav-list">
-      {contacts.map((item)=>{
+      {userInfo.contacts.map((item)=>{
         return <ListButton key={item.contactId} {...item} userId={userInfo._id} className="nav-list-item" />
       })}
     </List>

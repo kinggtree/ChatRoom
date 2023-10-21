@@ -4,6 +4,7 @@ import MessageInput from "./MessageInput";
 import './styles.css';
 import WebSocketContext from "./WebSocketContext";
 import axios from "axios";
+import { useSelector } from "react-redux";
 const {REACT_APP_API_BASE_URL}=process.env;
 
 
@@ -49,10 +50,12 @@ function ChatMessage({ message, send, senderName }) {
 
 
 // 聊天框部分
-function MessageContent({userInfo, componentInfo}) {
+function MessageContent({componentInfo}) {
   const ws=useRef(null);
   const [socket, setSocket]=useState();
   const [message, setMessage]=useState([]);
+
+  const userInfo=useSelector(state=>state.userInfo.item);
 
 
   useEffect(()=>{

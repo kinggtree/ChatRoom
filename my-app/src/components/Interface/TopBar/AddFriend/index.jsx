@@ -3,9 +3,14 @@ import React, { useState } from "react";
 import './styles.css';
 import axios from "axios";
 
+import { useDispatch } from 'react-redux';
+import { fetchUserInfo } from "../../actions";
+
+
 // 添加好友组件
 function AddFriend({updateInfo, isOpen, setIsOpen}) {
   const[friendName, setFriendName]=useState('');
+  const dispatch=useDispatch();
 
   const handleSubmit=function(e){
     axios.post('/api/newFriend', {friendName: friendName})
@@ -15,6 +20,7 @@ function AddFriend({updateInfo, isOpen, setIsOpen}) {
           updateInfo();
           setIsOpen(false);
           setFriendName('');
+          dispatch(fetchUserInfo());
         } else {
           alert(response.data);
         }

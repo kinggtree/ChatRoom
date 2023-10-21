@@ -5,11 +5,15 @@ import { useNavigate } from "react-router-dom";
 import LogOut from "./LogOut";
 import AddFriend from "./AddFriend";
 
+import { useSelector } from 'react-redux';
 
-function TopBar({ username, updateInfo }) {
+
+function TopBar() {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
+
+  const userInfo=useSelector(state=>state.userInfo.item);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,7 +41,7 @@ function TopBar({ username, updateInfo }) {
   return (
     <Toolbar className="top-bar">
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
-        欢迎，用户 {username}.
+        欢迎，用户 {userInfo.username}.
       </Typography>
 
       {/* Menu Button */}
@@ -56,7 +60,7 @@ function TopBar({ username, updateInfo }) {
         <MenuItem onClick={openAddFriend}>添加好友</MenuItem>
       </Menu>
 
-      <AddFriend updateInfo={updateInfo} isOpen={isAddFriendOpen} setIsOpen={setIsAddFriendOpen}/>
+      <AddFriend isOpen={isAddFriendOpen} setIsOpen={setIsAddFriendOpen}/>
       
       <LogOut />
     </Toolbar>

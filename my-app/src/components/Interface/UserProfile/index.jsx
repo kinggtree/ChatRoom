@@ -1,47 +1,44 @@
 import React, { useEffect, useState } from "react";
 import './styles.css';
-import axios from "axios";
 import { List, 
     ListItemText, 
     CircularProgress, 
     Typography,
     ListItemButton,
-    Paper,
 } from "@mui/material";
 import { Link, Route, Routes } from "react-router-dom";
 import EditInfo from "./EditInfo";
 import ManageContacts from "./ManageContacts"
 import EditPwd from "./EditPwd";
 
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPersonalInfo } from "./actions";
+
 
 
 // 用户档案总界面
-const UserProfile = function({updateInfo}) {
-    const [personalInfo, setPersonInfo]=useState({});
+const UserProfile = function() {
     const [loading, setLoading]=useState(true);
+    const dispatch=useDispatch();
+    const personalInfo=useSelector(state=>state.personalInfo.item);
 
 
     useEffect(() => {
-        axios.post('/api/personalProfile')
-        .then((response)=>{
-            setPersonInfo(response.data);
-            setLoading(false);
-        }).catch((err)=>{
-            console.log(err);
-        });
+      dispatch(fetchPersonalInfo());
+      setLoading(false);
     }, []);
 
     if(loading) {
-        return <CircularProgress />
+      return <CircularProgress />
     }
 
 
     return (
     <div className="user-profile">
       <img 
-          src={personalInfo.profilePictureURL} 
-          alt={`${personalInfo.username}'s profile`} 
-          className="profile-picture" 
+        src={personalInfo.profilePictureURL} 
+        alt={`${personalInfo.username}'s profile`} 
+        className="profile-picture" 
       />
       <h1 className="username">{personalInfo.username}</h1>
       <p> 点赞数: {personalInfo.like}</p>
@@ -69,7 +66,7 @@ const UserProfile = function({updateInfo}) {
           />
           <Route
             path="/unfriend"
-            element={<ManageContacts {...personalInfo} updateInfo={updateInfo}/>}
+            element={<ManageContacts />}
           />
           <Route
             path="/changePwd" 
