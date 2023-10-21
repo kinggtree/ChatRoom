@@ -459,5 +459,34 @@ router.post('/serverSendNew', function(req, res) {
   });
 });
 
+// 通过传入的联系人ID，获取所有联系人的全部信息
+router.post('/fullContact', function(req, res){
+
+  const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+  
+  if(!req.session._id)
+    return res.status(401).send();
+
+  if(!Array.isArray(req.body.contactIds)) {
+    return res.status(400).send('messageIds should be an array');
+  };
+
+
+  User.find({_id: {$in: req.body.contactIds}})
+    .then(response=>{
+      const fullContactArray=response.map(item=>({
+          _id: item._id,
+          username: item.username,
+          profilePictureURL: URLPath+item.profilePictureName,
+          isNewMessage: false
+      }));
+      res.status(200).send(fullContactArray);
+    }
+    ).catch(err=>{
+      console.log(err);
+      res.status(500).send('internal server error');
+    })
+})
+
 
 module.exports = router;

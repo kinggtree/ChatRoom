@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserInfo } from "./components/Interface/actions";
+import { fetchUserInfo } from "../reduxActions/userInfoActions";
 
 //slice (reducer)
 const userInfoSlice=createSlice({

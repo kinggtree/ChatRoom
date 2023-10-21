@@ -12,7 +12,7 @@ import ManageContacts from "./ManageContacts"
 import EditPwd from "./EditPwd";
 
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPersonalInfo } from "./actions";
+import { fetchPersonalInfo } from "../../../reduxActions/personalInfoActions";
 
 
 

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchPersonalInfo } from "./components/Interface/UserProfile/actions";
+import { fetchPersonalInfo } from '../reduxActions/personalInfoActions';
 
 
 // slice (reducer)

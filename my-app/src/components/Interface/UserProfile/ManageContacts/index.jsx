@@ -13,42 +13,25 @@ import { List,
 import DeleteIcon from'@mui/icons-material/Delete';
 import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import './styles.css'
-import { useSelector } from "react-redux";
+
+import { fetchFullContact } from "../../../../reduxActions/fullContactActions";
+import {fetchUserInfo} from "../../../../reduxActions/userInfoActions";
+import { useDispatch, useSelector } from "react-redux";
 
 
 // 每个联系人的组件
-function ContactsItem(item){
-  const [friendInfo, setFriendInfo]=useState({});
-  const [isLoading, setIsLoading]=useState(true);
-
-
-  useEffect(()=>{
-    axios.post('/api/getFriendBoxInfo', {friendId: item.contactId})
-    .then((response)=>{
-      setFriendInfo(response.data);
-      setIsLoading(false);
-    }).catch((err)=>{
-      console.log(err);
-    });
-  },[]);
+function ContactsItem({_id, username, profilePictureURL, dispatch}){
 
   const removeFriend=function(){
-    axios.post('/api/unfriend', {friendId: friendInfo._id})
+    axios.post('/api/unfriend', {friendId: _id})
     .then(()=>{
         alert('remove successfully!');
+        dispatch(fetchUserInfo());
     }).catch((err)=>{
         console.log(err);
     });
 
   };
-
-  if(isLoading){
-    return (
-      <div>
-        <CircularProgress />
-      </div>
-    );
-  }
 
   return(
   <ListItem 
@@ -59,11 +42,11 @@ function ContactsItem(item){
   }>
     <ListItemAvatar>
       <Avatar
-        alt={'profile photo of '+friendInfo.username}
-        src={friendInfo.profilePictureURL}
+        alt={'profile photo of '+username}
+        src={profilePictureURL}
       />
     </ListItemAvatar>
-    <ListItemText primary={friendInfo.username} />
+    <ListItemText primary={username} />
   </ListItem>
   );
 };
@@ -78,6 +61,10 @@ function ManageContacts(){
   const [usingContact, setUsingContact]=useState([]);
 
   const contacts=useSelector(state=>state.userInfo.item.contacts);
+  const dispatch=useDispatch();
+  const fullContact=useSelector(state=>state.fullContact.item);
+  const loadingStatus=useSelector(state=>state.fullContact.status);
+
 
   const sortContact=(newContacts)=>{
     const sortedContacts = newContacts.slice().sort((a, b) => {
@@ -93,48 +80,34 @@ function ManageContacts(){
     setOrderedContact(sortedContacts);
   }
 
-  const initContact=async ()=>{
-    try{
-      const promises = contacts.map(async (item)=>{
-        const response = await axios.post('/api/getFriendName', { friendId: item.contactId });
-        return {
-          'contactUsername': response.data,
-          'contactId': item.contactId
-        };
-      });
 
-      const results=await Promise.all(promises);
+  // 专门处理初始化加载
+  useEffect(() => {
+    dispatch(fetchFullContact(contacts));
+  }, []);
 
-      setOriginalContact(results);
+  // 处理结果返回成功后
+  useEffect(()=>{
+    if(loadingStatus==='succeeded'){
+      setOriginalContact(fullContact);
 
-      setUsingContact(results);
+      setUsingContact(fullContact);
 
-      sortContact(results);
+      sortContact(fullContact);
 
       setIsLoading(false);
-      
-      } catch(err) {
-      console.log(err);
     }
-  }
 
+  }, [loadingStatus])
 
-// 专门处理初始化加载
-useEffect(() => {
-  if (isLoading) {
-    initContact();
-  }
-}, [isLoading]);
-
-// 处理排序状态的变化
-useEffect(() => {
-  if (isSort) {
-    setUsingContact(orderedContact);
-  } else {
-    setUsingContact(originalContact);
-  }
-}, [isSort]);
-
+  // 处理排序状态的变化
+  useEffect(() => {
+    if (isSort) {
+      setUsingContact(orderedContact);
+    } else {
+      setUsingContact(originalContact);
+    }
+  }, [isSort]);
 
 
   const changeSort=()=>{
@@ -155,7 +128,7 @@ useEffect(() => {
     </Toolbar>
     <List component="nav" className="contacts">
       {usingContact.map((item)=>{
-        return <ContactsItem key={item.contactId} {...item} />
+        return <ContactsItem key={item._id} dispatch={dispatch} {...item} />
       })}
     </List>
   </div>

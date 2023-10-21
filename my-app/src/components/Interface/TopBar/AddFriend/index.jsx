@@ -4,11 +4,11 @@ import './styles.css';
 import axios from "axios";
 
 import { useDispatch } from 'react-redux';
-import { fetchUserInfo } from "../../actions";
+import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
 
 
 // 添加好友组件
-function AddFriend({updateInfo, isOpen, setIsOpen}) {
+function AddFriend({ isOpen, setIsOpen }) {
   const[friendName, setFriendName]=useState('');
   const dispatch=useDispatch();
 
@@ -17,7 +17,6 @@ function AddFriend({updateInfo, isOpen, setIsOpen}) {
       .then(function(response){
         if(response.status===200){
           alert("添加好友完成");
-          updateInfo();
           setIsOpen(false);
           setFriendName('');
           dispatch(fetchUserInfo());

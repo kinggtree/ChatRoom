@@ -6,24 +6,35 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { CircularProgress, Grid } from "@mui/material";
 
 import { useDispatch, useSelector } from 'react-redux';
-import {fetchUserInfo} from './actions';
+import { fetchUserInfo } from "../../reduxActions/userInfoActions";
+import { fetchFullContact } from "../../reduxActions/fullContactActions";
 
 function Interface(){
 
   const navigate = useNavigate();
 
   const dispatch=useDispatch();
-  const status=useSelector(state=>state.userInfo.status);
+  const userInfoStatus=useSelector(state=>state.userInfo.status);
+  const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
+  const [isLoading ,setIsLoading]=useState(true);
 
 
   useEffect(()=>{
     dispatch(fetchUserInfo());
-  }, [dispatch]); // 该组件在dispatch变化时重新渲染
+  }, []); // 该组件在dispatch变化时重新渲染
 
-  if(status!=='succeeded') {
+  useEffect(()=>{
+    if(userInfoStatus==='succeeded'){
+      dispatch(fetchFullContact(userInfoContact));
+      setIsLoading(false);
+    }
+  }, [userInfoStatus]);
+
+  if(isLoading) {
     return <CircularProgress />
   }
-  if(status==='failed'){
+  
+  if(userInfoStatus==='failed'){
     alert("出现错误，请重新登录")
     navigate('/');
     return;

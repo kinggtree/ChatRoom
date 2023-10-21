@@ -10,7 +10,7 @@ import FriendProfile from "./FriendProfile";
 import MessageContent from "./MessageContent";
 
 import { useSelector, useDispatch } from "react-redux";
-import { fetchFriendBoxInfo } from "./actions";
+import { fetchFriendBoxInfo } from "../../../../reduxActions/friendBoxActions";
 
 import './styles.css';
 
@@ -36,21 +36,28 @@ function FriendBox() {
   const dispatch=useDispatch();
   const userInfo=useSelector(state=>state.userInfo.item);
   const friendBoxInfo=useSelector(state=>state.friendBoxInfo.item);
+  const friendBoxStatus=useSelector(state=>state.friendBoxInfo.status);
+
+  const senderId = userInfo._id;
+  const receiverId = location.pathname.split('/')[3];
 
 
   useEffect(()=>{
-    const senderId = userInfo._id;
-    const receiverId = location.pathname.split('/')[3];
-
     dispatch(fetchFriendBoxInfo(receiverId));
+    
+  },[location.pathname]);
 
-    setComponentInfo({
-      senderId: senderId,
-      receiverId: receiverId,
-      friendInfo: friendBoxInfo
-    });
-    setIsLoading(false);
-  },[userInfo._id, location.pathname]);
+  useEffect(()=>{
+    if(friendBoxStatus==='succeeded'){
+      setComponentInfo({
+        senderId: senderId,
+        receiverId: receiverId,
+        friendInfo: friendBoxInfo
+      });
+      setIsLoading(false);
+    }
+
+  }, [friendBoxStatus])
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeFriendMenu=()=>setAnchorEl(null);

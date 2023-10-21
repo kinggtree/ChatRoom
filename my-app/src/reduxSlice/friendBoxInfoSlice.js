@@ -1,4 +1,4 @@
-import { fetchFriendBoxInfo } from "./components/Interface/Chat/FriendBox/actions";
+import { fetchFriendBoxInfo } from '../reduxActions/friendBoxActions';
 import { createSlice } from "@reduxjs/toolkit";
 
 const friendBoxSlice=createSlice({

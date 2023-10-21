@@ -3,7 +3,6 @@ import FriendBox from "./FriendBox";
 import Contacts from "./Contacts";
 import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box, Container} from "@mui/material";
 import { Route, Routes } from "react-router-dom";
-import { useSelector } from 'react-redux';
 
 import './styles.css'
 
@@ -24,7 +23,7 @@ function Chat(){
         {!isMediumScreen && (
           <Grid item sm={3}>
             <Paper className="contacts">
-              <Contacts/>
+              <Contacts />
             </Paper>
           </Grid>
         )}

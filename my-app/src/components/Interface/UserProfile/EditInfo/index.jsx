@@ -11,13 +11,16 @@ import {
     List,
     ListItem} from "@mui/material";
 import './styles.css'
+import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
+import { fetchPersonalInfo } from "../../../../reduxActions/personalInfoActions";
+import { useDispatch } from "react-redux";
 
 // 更改自我介绍组件
 function EditInfo() {
   const [newIntro, setNewIntro]=useState('');
   const [newUsername, setNewUsername]=useState('');
-
   const [gender, setGender]=useState('');
+  const dispatch=useDispatch();
 
   const handleSubmit=function(e){
     e.preventDefault();
@@ -25,9 +28,11 @@ function EditInfo() {
     if(newIntro==='')
       setNewIntro('');      // 设置这里为之前的个人介绍
 
-    axios.post('/api/changeIntro', {newUsername: newUsername,newIntro: newIntro, gender: gender})
+    axios.post('/api/changeIntro', {newUsername: newUsername, newIntro: newIntro, gender: gender})
       .then(()=>{
-        alert('修改成功！请重新登录以刷新');
+        alert('修改成功！');
+        dispatch(fetchUserInfo());
+        dispatch(fetchPersonalInfo());
       }).catch((err)=>{
         alert('cannot change!');
         console.log(err);

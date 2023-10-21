@@ -121,3 +121,16 @@ let resData={
 {unread: true}
 ```
 
+---
+
+### 10. fullContact API 返回数组内每个元素的格式
+
+```
+{
+  _id: item._id,
+  username: item.username,
+  profilePictureURL: URLPath+item.profilePictureName,
+  isNewMessage: false
+}
+```
+
