@@ -60,8 +60,8 @@ function ManageContacts(){
   const [orderedContact, setOrderedContact]=useState([]);
   const [usingContact, setUsingContact]=useState([]);
 
-  const contacts=useSelector(state=>state.userInfo.item.contacts);
   const dispatch=useDispatch();
+  const contacts=useSelector(state=>state.userInfo.item.contacts);
   const fullContact=useSelector(state=>state.fullContact.item);
   const loadingStatus=useSelector(state=>state.fullContact.status);
 
@@ -83,22 +83,25 @@ function ManageContacts(){
 
   // 专门处理初始化加载
   useEffect(() => {
-    dispatch(fetchFullContact(contacts));
+    // 如果fullContact已存在，初始化originalContact和orderedContact
+    if (fullContact && fullContact.length > 0) {
+      setOriginalContact(fullContact);
+      sortContact(fullContact); // 这里sortContact会设置orderedContact
+    } else {
+      // 如果fullContact不存在，发起API请求
+      dispatch(fetchFullContact(contacts));
+      console.log("API");
+    }
   }, []);
+  
 
   // 处理结果返回成功后
-  useEffect(()=>{
-    if(loadingStatus==='succeeded'){
-      setOriginalContact(fullContact);
-
-      setUsingContact(fullContact);
-
-      sortContact(fullContact);
-
+  useEffect(() => {
+    if (loadingStatus === 'succeeded') {
       setIsLoading(false);
     }
-
-  }, [loadingStatus])
+  }, [loadingStatus]);
+  
 
   // 处理排序状态的变化
   useEffect(() => {
@@ -114,7 +117,7 @@ function ManageContacts(){
     setIsSort(!isSort);
   }
 
-  if(isLoading){
+  if(loadingStatus!=='succeeded'){
     return <CircularProgress />
   }
 
@@ -127,7 +130,7 @@ function ManageContacts(){
       </IconButton>
     </Toolbar>
     <List component="nav" className="contacts">
-      {usingContact.map((item)=>{
+      {fullContact.map((item)=>{
         return <ContactsItem key={item._id} dispatch={dispatch} {...item} />
       })}
     </List>

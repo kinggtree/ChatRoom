@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Chat from "./Chat"
 import TopBar from "./TopBar";
 import UserProfile from "./UserProfile";
@@ -8,7 +8,6 @@ import { CircularProgress, Grid } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserInfo } from "../../reduxActions/userInfoActions";
 import { fetchFullContact } from "../../reduxActions/fullContactActions";
-import { newMessageReceived } from "../../reduxSlice/unreadContactSlice";
 
 function Interface(){
 
@@ -19,14 +18,33 @@ function Interface(){
   const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
   const [isLoading ,setIsLoading]=useState(true);
 
-  
+  const eventSourceRef=useRef(null);
+
 
   useEffect(()=>{
     dispatch(fetchUserInfo());
 
-    dispatch({ type: 'START_SSE_CONNECTION' });
+    eventSourceRef.current=new EventSource('/api/serverSendNew');
 
-    //当不再渲染的时候关闭连接
+    eventSourceRef.current.onmessage=event=>{
+      const data = JSON.parse(event.data);
+      // 这里进行分发Redux操作
+      // 这里也可以选择导入unreadContactSlice.js里面的action
+      dispatch({ type: 'unreadContact/newMessageReceived', payload: data })
+    };
+
+    eventSourceRef.current.onerror = error => {
+      console.error("SSE error:", error);
+    };
+
+    return () => {
+      if (eventSourceRef.current) {
+        console.log("trying to disconnect...");
+        eventSourceRef.current.close();
+        console.log("sended close req...");
+      }
+    };
+    
 
   }, [dispatch]); // 该组件在dispatch变化时重新渲染
 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import './styles.css';
 import axios from "axios";
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
 
 
@@ -11,8 +11,13 @@ import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
 function AddFriend({ isOpen, setIsOpen }) {
   const[friendName, setFriendName]=useState('');
   const dispatch=useDispatch();
+  const username=useSelector(state=>state.userInfo.item.username);
 
   const handleSubmit=function(e){
+    if(friendName===username){
+      alert("不能添加你自己");
+      return;
+    }
     axios.post('/api/newFriend', {friendName: friendName})
       .then(function(response){
         if(response.status===200){

@@ -5,18 +5,25 @@ const unreadContactSlice=createSlice({
   initialState: {},
   reducers: {
     newMessageReceived: (state, action)=>{
-      const senderId=action.payload;
+      const senderId=action.payload.senderId;
+      const messageId=action.payload.messageId;
       if (state[senderId]) {
         state[senderId].unreadCount += 1;
+        state[senderId].messageIds.push(messageId);
       } else {
-        state[senderId] = { unreadCount: 1 };
+        state[senderId] = { 
+          unreadCount: 1,
+          messageIds: [messageId]
+        };
       }
     },
     
     messageRead: (state, action)=>{
-      const senderId=action.payload;
+      const senderId=action.payload.senderId;
       if(state[senderId]){
         state[senderId].unreadCount=0;
+        // clear arr
+        state[senderId].messageIds.length=0;
       }
     }
   },

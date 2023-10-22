@@ -1,30 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
 import './styles.css';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { messageRead } from '../../../../reduxSlice/unreadContactSlice';
+import axios from 'axios';
 
 
-function ListButton({_id, username, profilePictureURL, unreadNum }) {
+function ListButton({_id, username, profilePictureURL, unreadObj }) {
   const contactId=_id;
   let link=contactId;
 
-  console.log(useSelector(state=>state.unreadContact));
-
-  const isUnread = unreadNum && unreadNum > 0; // 如果unreadNum存在且大于0，则为true，否则为false
+  const [unreadNum, setUnreadNum]=useState(unreadObj ? unreadObj.unreadCount : 0);
+  const [isUnread, setIsUnread]=useState(unreadNum>0);
   const dispatch=useDispatch();
 
 
+  const handleClick=()=>{
+    if(isUnread){
+      dispatch(messageRead({
+        senderId: contactId
+      }));
+      setIsUnread(false);
+      axios.post('/api/setIsRead', {messageIds: unreadObj.messageIds});
+    }
+  }
+
   return (
-    <ListItemButton component={Link} to={link} onClick={()=>dispatch(messageRead(contactId))}>
+    <ListItemButton component={Link} to={link} onClick={handleClick}>
       <ListItemAvatar>
         <Badge
-        color="error"
-        variant="dot"
-        overlap="circular"
-        invisible={!isUnread}
+          color="error"
+          badgeContent={unreadNum > 0 ? unreadNum : null} // 如果unreadNum大于0，则显示数量，否则不显示
+          overlap="circular"
+          invisible={!isUnread}
         >
           <Avatar
             alt={'profile photo of '+username}
@@ -36,6 +46,7 @@ function ListButton({_id, username, profilePictureURL, unreadNum }) {
     </ListItemButton>
   )
 }
+
 
 
 function Contacts() {
@@ -50,7 +61,7 @@ function Contacts() {
   return (
     <List component="nav" className="nav-list">
       {fullContact.map((item)=>{
-        return <ListButton key={item._id} {...item} unreadNum={unreadContact[item._id]} className="nav-list-item" />
+        return <ListButton key={item._id} {...item} unreadObj={unreadContact[item._id]} className="nav-list-item" />
       })}
     </List>
   )

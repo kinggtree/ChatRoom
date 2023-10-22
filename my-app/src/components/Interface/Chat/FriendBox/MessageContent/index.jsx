@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Container } from "@mui/material";
+import { CircularProgress, Container } from "@mui/material";
 import MessageInput from "./MessageInput";
 import './styles.css';
 import WebSocketContext from "./WebSocketContext";
@@ -57,6 +57,8 @@ function MessageContent({componentInfo}) {
 
   const userInfo=useSelector(state=>state.userInfo.item);
 
+  const [isLoading, setIsLoading]=useState(true);
+
 
   useEffect(()=>{
     const senderId=componentInfo.senderId;
@@ -94,16 +96,16 @@ function MessageContent({componentInfo}) {
 
           setMessage(prevMessage => [...prevMessage, ...newMessages]);
 
-          // 收集未读消息的ID
-          // filter用来选择接收方是自己的消息
-          const unreadMessageIds = newMessages
-            .filter(m => ((m.receiver.receiverId===userInfo._id) && m.unread))
-            .map(m => m._id);
+          // // 收集未读消息的ID
+          // // filter用来选择接收方是自己的消息
+          // const unreadMessageIds = newMessages
+          //   .filter(m => ((m.receiver.receiverId===userInfo._id) && m.unread))
+          //   .map(m => m._id);
 
-          // 如果有未读消息，发送请求标记它们为已读
-          if (unreadMessageIds.length > 0) {
-              axios.post('/api/setIsRead', { messageIds: unreadMessageIds });
-          }
+          // // 如果有未读消息，发送请求标记它们为已读
+          // if (unreadMessageIds.length > 0) {
+          //     axios.post('/api/setIsRead', { messageIds: unreadMessageIds });
+          // }
         };
       } catch (err) {
         console.log(err);
@@ -113,8 +115,7 @@ function MessageContent({componentInfo}) {
     if (socket) {
       fetchMessage();
     }
-}, [socket]);
-
+  }, [socket]);
 
 
 

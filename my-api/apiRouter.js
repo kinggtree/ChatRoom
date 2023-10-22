@@ -13,6 +13,8 @@ mongoose.connect(process.env.EXPRESS_DATABASE_URL, {
 });
 const User=require("./schema/user");
 const Message=require('./schema/message');
+const { clearInterval } = require('timers');
+const ObjectId = mongoose.Types.ObjectId;
 
 // 注册
 router.post('/signup', async function(req, res){
@@ -89,7 +91,6 @@ router.post('/login', function(req, res) {
           res.status(400).send('密码错误');
         } else {
           const session=req.session;
-          session['username'] = user.username;
           session['_id'] = user._id;
           res.status(200).send("登录成功");
         };
@@ -105,9 +106,6 @@ router.post('/login', function(req, res) {
 // 添加新好友
 router.post('/newFriend', async function(req, res) {
   try {
-    if(req.body.friendName === req.session.username) {
-      return res.status(401).send("无法添加你自己");
-    };
 
     // 找到对方的user信息
     const user = await User.findOne({username: req.body.friendName});
@@ -163,7 +161,7 @@ router.post('/getUserInfo', function(req, res) {
   User.findOne({_id: req.session._id})
     .then((response)=>{
       res.status(200).send({
-        'username': req.session.username,
+        'username': response.username,
         'contacts': response.contacts,
         '_id': req.session._id
       });
@@ -193,7 +191,7 @@ router.post('/personalProfile', function(req, res) {
     .then((response)=>{
       const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
       res.status(200).send({
-        'username': req.session.username,
+        'username': response.username,
         'profilePictureURL': URLPath+response.profilePictureName,
         'self_intro': response.self_intro,
         'gender': response.gender,
@@ -244,23 +242,8 @@ router.post('/changeIntro', function(req, res){
   if(!req.session._id)
     return res.status(401).send();
 
-  let newGender='';
-  let newUsername='';
-  let newIntro='';
-
-  // 如果性别都为空的话则设置原来的值
-  if(req.body.gender==='')
-    newGender=req.session.gender;
-  else
-    newGender=req.body.gender;
-
-  // 姓名为空设置默认
-  if(req.body.newUsername==='')
-    newUsername=req.session.username;
-  else
-    newUsername=req.body.newUsername;
-
-  // 个人介绍为空的设置见前端
+  const newGender=req.body.gender;
+  const newUsername=req.body.newUsername;
 
 
   let Intro='';
@@ -436,53 +419,73 @@ router.get('/serverSendNew', async function(req, res) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Content-Encoding', 'none');
+  res.flushHeaders();  // 确保头部立即发送
 
   const userId = req.session._id;
+
+  console.log("SSE connection open by user "+userId);
 
   try {
     // 获取初始化的所有未读消息数量
     const unreadMessages = await Message.find({
-      'receiver.receiverId': userId,
+      'receiver.receiverId': new ObjectId(userId),
       unread: true
     });
 
+
     // 发送初始化数据到前端
     for (const msg of unreadMessages) {
-      console.log("senderId: "+msg.sender.senderId.toString());     // 要发送的未读消息到前端
       res.write(`data: ${JSON.stringify({ 
-        senderId: msg.sender.senderId
+        senderId: msg.sender.senderId.toString(),
+        messageId: msg._id
       })}\n\n`);
+      res.flushHeaders();  // 确保数据立即发送
     }
 
     // 使用$match来过滤变更
     const pipeline = [
       {
         $match: {
-          "fullDocument.sender.senderId": userId        // 监听自己发送出去的消息
+          "fullDocument.receiver.receiverId": new ObjectId(userId)
         }
       }
     ];
 
+    // 监听我方收到的消息
     const changeStream = Message.watch(pipeline);
 
     changeStream.on('change', (change) => {
       if (change.operationType === 'insert') {
         const newMessage = change.fullDocument;
-        console.log(newMessage);      // 理论上来说现在监听的是自己发送出去的消息
         res.write(`data: ${JSON.stringify({ 
-          senderId: newMessage.sender.senderId 
+          senderId: newMessage.sender.senderId.toString(),
+          messageId: newMessage._id
         })}\n\n`);
+        res.flushHeaders();  // 确保头部立即发送
       }
     });
 
     // 心跳检查
-    setInterval(() => {
+    const heartbeatId=setInterval(() => {
       res.write(':heartbeat\n\n');
-      console.log("heartbeat!");
     }, 15000);
 
+    // 5分钟后定时关闭
+    const timeoutId = setTimeout(() => {
+      console.log("SSE Connection timed out for user " + userId);
+      clearInterval(heartbeatId);
+      if (changeStream) changeStream.close();
+      res.end();
+    }, 300000);  // 300,000毫秒 == 5分钟
+
+    // 关闭连接
     res.on('close', () => {
+      clearInterval(heartbeatId);
+      clearTimeout(timeoutId);  // 清除超时，防止在连接已关闭后仍然执行
       changeStream.close();
+      console.log("SSE Connection closed by user "+userId);
+      res.end();
     });
 
   } catch (error) {

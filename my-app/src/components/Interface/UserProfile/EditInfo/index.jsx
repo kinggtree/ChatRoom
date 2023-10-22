@@ -13,21 +13,28 @@ import {
 import './styles.css'
 import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
 import { fetchPersonalInfo } from "../../../../reduxActions/personalInfoActions";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-// 更改自我介绍组件
+// 更改用户信息组件
 function EditInfo() {
-  const [newIntro, setNewIntro]=useState('');
-  const [newUsername, setNewUsername]=useState('');
-  const [gender, setGender]=useState('');
+  const personalInfo=useSelector(state=>state.personalInfo.item);
+
+  const [newIntro, setNewIntro]=useState(personalInfo.self_intro);
+  const [newUsername, setNewUsername]=useState(personalInfo.username);
+  const [gender, setGender]=useState(personalInfo.gender);
   const dispatch=useDispatch();
+
+
 
   const handleSubmit=function(e){
     e.preventDefault();
 
-    if(newIntro==='')
-      setNewIntro('');      // 设置这里为之前的个人介绍
+    if(newUsername===''){
+      alert('用户名不能为空！');
+      return;
+    }
 
+    
     axios.post('/api/changeIntro', {newUsername: newUsername, newIntro: newIntro, gender: gender})
       .then(()=>{
         alert('修改成功！');
