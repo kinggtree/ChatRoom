@@ -8,7 +8,7 @@
 
 - 前端：React
 - 后端：Express
-
+- 状态管理：Redux
 
 ## 🔬 项目结构
 
@@ -16,6 +16,7 @@
 ├── how_2_deploy
 ├── my-api
 │   ├── bin
+│   ├── routes
 │   ├── schema
 │   ├── static
 │   │   └── profile_photos
@@ -27,24 +28,26 @@
     │       └── js
     ├── public
     └── src
-        └── components
-            ├── Interface
-            │   ├── Chat
-            │   │   ├── Contacts
-            │   │   └── FriendBox
-            │   │       ├── FriendProfile
-            │   │       └── MessageContent
-            │   │           ├── MessageInput
-            │   │           └── WebSocketContext
-            │   ├── TopBar
-            │   │   ├── AddFriend
-            │   │   └── LogOut
-            │   └── UserProfile
-            │       ├── EditInfo
-            │       ├── EditPwd
-            │       └── ManageContacts
-            ├── LoginForm
-            └── SignUp
+        ├── components
+        │   ├── Interface
+        │   │   ├── Chat
+        │   │   │   ├── Contacts
+        │   │   │   └── FriendBox
+        │   │   │       ├── FriendProfile
+        │   │   │       └── MessageContent
+        │   │   │           ├── MessageInput
+        │   │   │           └── WebSocketContext
+        │   │   ├── TopBar
+        │   │   │   ├── AddFriend
+        │   │   │   └── LogOut
+        │   │   └── UserProfile
+        │   │       ├── EditInfo
+        │   │       ├── EditPwd
+        │   │       └── ManageContacts
+        │   ├── LoginForm
+        │   └── SignUp
+        ├── reduxActions
+        └── reduxSlice
 ```
 
 

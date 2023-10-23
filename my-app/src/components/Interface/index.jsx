@@ -51,6 +51,7 @@ function Interface(){
   useEffect(()=>{
     if(userInfoStatus==='succeeded'){
       dispatch(fetchFullContact(userInfoContact));
+      dispatch({type:'unreadContact/initialUnreadContact', payload: userInfoContact});
       setIsLoading(false);
     }
   }, [userInfoStatus]);

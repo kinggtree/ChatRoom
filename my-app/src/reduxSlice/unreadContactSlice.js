@@ -4,6 +4,16 @@ const unreadContactSlice=createSlice({
   name: 'unreadContact',
   initialState: {},
   reducers: {
+    initialUnreadContact: (state, action)=>{
+      const contactIds=action.payload;
+      console.log(action.payload);
+      contactIds.map(item=>{
+        state[item.contactId]={
+          unreadCount: 0,
+          messageIds: []
+        }
+      });
+    },
     newMessageReceived: (state, action)=>{
       const senderId=action.payload.senderId;
       const messageId=action.payload.messageId;

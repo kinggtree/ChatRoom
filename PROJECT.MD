@@ -134,3 +134,16 @@ let resData={
 }
 ```
 
+---
+
+### 11. Redux中unreadContact 状态内容
+
+```
+{
+  state[contactId]={
+    unreadCount: 0,
+    messageIds: []
+  }
+}
+```
+
