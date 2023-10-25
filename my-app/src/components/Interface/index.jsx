@@ -8,6 +8,7 @@ import { CircularProgress, Grid } from "@mui/material";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserInfo } from "../../reduxActions/userInfoActions";
 import { fetchFullContact } from "../../reduxActions/fullContactActions";
+import axios from "axios";
 
 function Interface(){
 
@@ -22,21 +23,37 @@ function Interface(){
 
 
   useEffect(()=>{
+
+    axios.post('/api/ping')
+      .then(res=>{
+        if(res.status===200)
+          console.log(res.data);
+        else
+          console.log("ping warning status: "+res.status);
+      }).catch(err=>{
+        if(err.response.status===401)
+          alert('您还未登录！');
+        else
+          console.log(err);
+        navigate('/');
+      })
+
     dispatch(fetchUserInfo());
 
     eventSourceRef.current=new EventSource('/api/serverSendNew');
 
+    // 当有新消息的时候，向unreadContact里面的state加入新消息
     eventSourceRef.current.onmessage=event=>{
       const data = JSON.parse(event.data);
-      // 这里进行分发Redux操作
       // 这里也可以选择导入unreadContactSlice.js里面的action
       dispatch({ type: 'unreadContact/newMessageReceived', payload: data })
     };
 
     eventSourceRef.current.onerror = error => {
-      console.error("SSE error:", error);
+      console.error("SSE error.");
     };
 
+    // 组件卸载的时候断开连接
     return () => {
       if (eventSourceRef.current) {
         console.log("trying to disconnect...");

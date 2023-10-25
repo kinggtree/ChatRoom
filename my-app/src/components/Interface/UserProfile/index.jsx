@@ -21,17 +21,22 @@ const UserProfile = function() {
     const [loading, setLoading]=useState(true);
     const dispatch=useDispatch();
     const personalInfo=useSelector(state=>state.personalInfo.item);
+    const personalInfoStatus=useSelector(state=>state.personalInfo.status);
 
-
+    // 获取个人信息
     useEffect(() => {
       dispatch(fetchPersonalInfo());
-      setLoading(false);
-    }, []);
+    }, [dispatch]);
+
+    useEffect(()=>{
+      if(personalInfoStatus==='succeeded'){
+        setLoading(false);
+      }
+    }, [personalInfoStatus]);
 
     if(loading) {
       return <CircularProgress />
     }
-
 
     return (
     <div className="user-profile">

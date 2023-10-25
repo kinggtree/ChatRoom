@@ -6,7 +6,6 @@ const unreadContactSlice=createSlice({
   reducers: {
     initialUnreadContact: (state, action)=>{
       const contactIds=action.payload;
-      console.log(action.payload);
       contactIds.map(item=>{
         state[item.contactId]={
           unreadCount: 0,

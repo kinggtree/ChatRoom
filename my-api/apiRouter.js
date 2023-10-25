@@ -16,10 +16,18 @@ const Message=require('./schema/message');
 const { clearInterval } = require('timers');
 const ObjectId = mongoose.Types.ObjectId;
 
+
+router.post('/ping', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+  else
+    return res.status(200).send('ping pang pong');
+})
+
+
 // 注册
 router.post('/signup', async function(req, res){
   try{
-
     // 输入验证
     if (!req.body.newUsername || !req.body.newPassword || !req.body.key) {
       return res.status(400).send("Username, password, and key are required");
@@ -105,6 +113,8 @@ router.post('/login', function(req, res) {
 
 // 添加新好友
 router.post('/newFriend', async function(req, res) {
+  if(!req.session._id)
+    return res.status(401).send();
   try {
 
     // 找到对方的user信息
@@ -302,7 +312,7 @@ router.post('/changePassword', function(req, res){
 })
 
 // 获得朋友档案
-router.post('/getFriendBoxInfo', function(req, res){
+router.post('/getFriendInfo', function(req, res){
   if(!req.session._id)
     return res.status(401).send();
 
@@ -369,7 +379,7 @@ router.post('/getUnread', function(req, res){
   });
 });
 
-// 设置单条消息已读
+// 设置（多条）消息已读
 router.post('/setIsRead', function(req, res){
   if(!req.session._id)
     return res.status(401).send();
@@ -407,6 +417,37 @@ router.post('/like', function(req, res){
       res.status(500).send('internal server error');
     })
 });
+
+
+// 通过传入的联系人ID，获取所有联系人的全部信息
+router.post('/fullContact', function(req, res){
+
+  const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+  
+  if(!req.session._id)
+    return res.status(401).send();
+
+  if(!Array.isArray(req.body.contactIds)) {
+    return res.status(400).send('messageIds should be an array');
+  };
+
+
+  User.find({_id: {$in: req.body.contactIds}})
+    .then(response=>{
+      const fullContactArray=response.map(item=>({
+        _id: item._id,
+        username: item.username,
+        profilePictureURL: URLPath+item.profilePictureName,
+        isNewMessage: false
+      }));
+      res.status(200).send(fullContactArray);
+    }
+    ).catch(err=>{
+      console.log(err);
+      res.status(500).send('internal server error');
+    })
+});
+
 
 
 // 由服务器主动发送未读提示
@@ -495,34 +536,6 @@ router.get('/serverSendNew', async function(req, res) {
 });
 
 
-// 通过传入的联系人ID，获取所有联系人的全部信息
-router.post('/fullContact', function(req, res){
-
-  const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
-  
-  if(!req.session._id)
-    return res.status(401).send();
-
-  if(!Array.isArray(req.body.contactIds)) {
-    return res.status(400).send('messageIds should be an array');
-  };
-
-
-  User.find({_id: {$in: req.body.contactIds}})
-    .then(response=>{
-      const fullContactArray=response.map(item=>({
-          _id: item._id,
-          username: item.username,
-          profilePictureURL: URLPath+item.profilePictureName,
-          isNewMessage: false
-      }));
-      res.status(200).send(fullContactArray);
-    }
-    ).catch(err=>{
-      console.log(err);
-      res.status(500).send('internal server error');
-    })
-})
 
 
 module.exports = router;

@@ -1,30 +1,27 @@
 //import axios from "axios";
-import React, { useContext, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useContext, useState, useRef } from "react";
 import { TextField, Button } from "@mui/material";
 import WebSocketContext from '../WebSocketContext'; 
 import SendIcon from '@mui/icons-material/Send';
 import "./styles.css";
 
 
-function MessageInput(userInfo){
+function MessageInput({idsInfo, scrollToBottom}){
   const [content, setContent]=useState('');
-  const location=useLocation();
   const ws=useContext(WebSocketContext);
 
-  const handleSubmit=(e)=>{
+
+  const handleSubmit=()=>{
 
     if(content.trim().length===0)
       return alert('text cannot be null.');
 
-    const receiverId=location.pathname.split('/')[3];
-
     const message={
       sender: {
-        senderId: userInfo._id
+        senderId: idsInfo.senderId
       },
       receiver:{
-        receiverId: receiverId
+        receiverId: idsInfo.receiverId
       },
       message:{
         type: 'text',
@@ -33,10 +30,12 @@ function MessageInput(userInfo){
     };
 
     if(ws && ws.readyState===WebSocket.OPEN){
-      console.log("sended message!");
       ws.send(JSON.stringify(message));
       setContent('');
     }
+
+    scrollToBottom();
+
   };
 
   const handleChange=(e)=>{

@@ -1,8 +1,8 @@
-import { fetchFriendBoxInfo } from '../reduxActions/friendBoxActions';
+import { fetchFriendInfo } from '../reduxActions/friendActions';
 import { createSlice } from "@reduxjs/toolkit";
 
-const friendBoxSlice=createSlice({
-  name: 'chatBoxInfo',
+const friendSlice=createSlice({
+  name: 'friendInfo',
   initialState:{
     item:{},
     status:'idle',
@@ -10,18 +10,18 @@ const friendBoxSlice=createSlice({
   },
   extraReducers: builder=>{
     builder
-      .addCase(fetchFriendBoxInfo.pending, state=>{
+      .addCase(fetchFriendInfo.pending, state=>{
         state.status='loading';
       })
-      .addCase(fetchFriendBoxInfo.fulfilled, (state, action)=>{
+      .addCase(fetchFriendInfo.fulfilled, (state, action)=>{
         state.status='succeeded';
         state.item=action.payload;
       })
-      .addCase(fetchFriendBoxInfo.rejected, (state, action)=>{
+      .addCase(fetchFriendInfo.rejected, (state, action)=>{
         state.status='failed';
         state.error=action.error.message;
       });
   }
 });
 
-export default friendBoxSlice.reducer;
+export default friendSlice.reducer;

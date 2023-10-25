@@ -15,7 +15,7 @@ import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 import './styles.css'
 
 import { fetchFullContact } from "../../../../reduxActions/fullContactActions";
-import {fetchUserInfo} from "../../../../reduxActions/userInfoActions";
+import { fetchUserInfo } from "../../../../reduxActions/userInfoActions";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -26,7 +26,7 @@ function ContactsItem({_id, username, profilePictureURL, dispatch}){
     axios.post('/api/unfriend', {friendId: _id})
     .then(()=>{
         alert('remove successfully!');
-        dispatch(fetchUserInfo());
+        dispatch(fetchUserInfo());  // 会触发根组件的获取联系人信息
     }).catch((err)=>{
         console.log(err);
     });

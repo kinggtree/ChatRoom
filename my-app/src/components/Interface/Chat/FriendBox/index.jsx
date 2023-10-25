@@ -10,7 +10,7 @@ import FriendProfile from "./FriendProfile";
 import MessageContent from "./MessageContent";
 
 import { useSelector, useDispatch } from "react-redux";
-import { fetchFriendBoxInfo } from "../../../../reduxActions/friendBoxActions";
+import { fetchFriendInfo } from "../../../../reduxActions/friendActions";
 
 import './styles.css';
 
@@ -19,15 +19,9 @@ import './styles.css';
 function FriendBox() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoading, setIsLoading]=useState(true);
-  const [componentInfo, setComponentInfo] = useState({
+  const [idsInfo, setIdsInfo] = useState({
     senderId: '',
     receiverId: '',
-    friendInfo: {
-      username: '',
-      self_intro: '',
-      gender: '',
-      profilePictureURL: ''
-    }
   });
   const open = Boolean(anchorEl);
   const location=useLocation();
@@ -35,29 +29,28 @@ function FriendBox() {
 
   const dispatch=useDispatch();
   const userInfo=useSelector(state=>state.userInfo.item);
-  const friendBoxInfo=useSelector(state=>state.friendBoxInfo.item);
-  const friendBoxStatus=useSelector(state=>state.friendBoxInfo.status);
+  const friendInfo=useSelector(state=>state.friendInfo.item);
+  const friendInfoStatus=useSelector(state=>state.friendInfo.status);
+
 
   const senderId = userInfo._id;
   const receiverId = location.pathname.split('/')[3];
 
-
+  // 获取启动聊天框所需信息
   useEffect(()=>{
-    dispatch(fetchFriendBoxInfo(receiverId));
-    
+    setIsLoading(true);
+    dispatch(fetchFriendInfo(receiverId));
   },[location.pathname]);
 
   useEffect(()=>{
-    if(friendBoxStatus==='succeeded'){
-      setComponentInfo({
+    if(friendInfoStatus==='succeeded'){
+      setIdsInfo({
         senderId: senderId,
         receiverId: receiverId,
-        friendInfo: friendBoxInfo
       });
       setIsLoading(false);
     }
-
-  }, [friendBoxStatus])
+  }, [friendInfoStatus])
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeFriendMenu=()=>setAnchorEl(null);
@@ -82,7 +75,7 @@ function FriendBox() {
 
           <Toolbar className="chat-topbar">
             <Typography variant="h6" className="friend-name">
-              {componentInfo.friendInfo.username}
+              {friendInfo.username}
             </Typography>
 
             <IconButton 
@@ -123,13 +116,13 @@ function FriendBox() {
             <Route
               path="/*"
               element={
-                <MessageContent componentInfo={componentInfo}  />
+                <MessageContent idsInfo={idsInfo}  />
               } 
             />
 
             <Route
               path="/friendProfile"
-              element={<FriendProfile componentInfo={componentInfo} />}
+              element={<FriendProfile />}
             />
           </Routes>
 

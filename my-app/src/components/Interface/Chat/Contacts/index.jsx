@@ -19,10 +19,10 @@ function ListButton({_id, username, profilePictureURL }) {
 
   useEffect(()=>{
     setIsUnread(unreadObj.unreadCount>0);
-  }, unreadObj);
+  }, [unreadObj]);
 
 
-
+  // 处理已读逻辑
   const handleClick=()=>{
     if(isUnread){
       dispatch(messageRead({

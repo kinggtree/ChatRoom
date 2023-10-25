@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CircularProgress, Container } from "@mui/material";
+import { Button, CircularProgress, Container } from "@mui/material";
 import MessageInput from "./MessageInput";
 import './styles.css';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import WebSocketContext from "./WebSocketContext";
-import axios from "axios";
 import { useSelector } from "react-redux";
 const {REACT_APP_API_BASE_URL}=process.env;
 
@@ -50,26 +50,41 @@ function ChatMessage({ message, send, senderName }) {
 
 
 // 聊天框部分
-function MessageContent({componentInfo}) {
+function MessageContent({idsInfo}) {
   const ws=useRef(null);
   const [socket, setSocket]=useState();
   const [message, setMessage]=useState([]);
 
   const userInfo=useSelector(state=>state.userInfo.item);
+  const friendInfo=useSelector(state=>state.friendInfo.item);
 
   const [isLoading, setIsLoading]=useState(true);
 
+  // 实现按钮，消息滚动到最下面
+  const messageEndRef=useRef(null);
+
+  const scrollToBottom=()=>{
+    messageEndRef.current?.scrollIntoView({behavior: "smooth"});
+  };
+
+  // 检查是否滚动到底部(目前这里还是有bug)
+  const isScrolledToBottom = (element) => {
+    return element.scrollHeight - element.scrollTop === element.clientHeight;
+  };  
+
 
   useEffect(()=>{
-    const senderId=componentInfo.senderId;
-    const receiverId=componentInfo.receiverId;
+    const senderId=idsInfo.senderId;
+    const receiverId=idsInfo.receiverId;
     ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${receiverId}`);
 
     ws.current.onerror=(error)=>{
       console.log(error);
+      setIsLoading(true);
     }
 
     ws.current.onopen=()=>{
+      setIsLoading(false);
       setSocket(ws.current);
     }
     
@@ -77,41 +92,46 @@ function MessageContent({componentInfo}) {
     return () => {
       ws.current && ws.current.close();
       setMessage([]);
+      // 设置正在加载
+      setIsLoading(true);
     };
-  },[componentInfo.receiverId]);
+  },[idsInfo.receiverId]);
 
 
+
+  // 获取新消息，添加到目前的消息列表并渲染
   useEffect(() => {
+    // 定义处理消息的函数
     const fetchMessage = async () => {
       try {
         socket.onmessage = function(event) {
           const receivedMessage = JSON.parse(event.data);
           let newMessages = [];
 
+          // 如果第一次获取所有消息，这个时候后端会发送一个叫messages的数组
           if (receivedMessage.messages) {
             newMessages = receivedMessage.messages;
           } else {
             newMessages = [receivedMessage];
           }
 
+          // 检查是否已经滚动到底部
+          const scrolledToBottom = isScrolledToBottom(messageEndRef.current.parentElement);
+
           setMessage(prevMessage => [...prevMessage, ...newMessages]);
 
-          // // 收集未读消息的ID
-          // // filter用来选择接收方是自己的消息
-          // const unreadMessageIds = newMessages
-          //   .filter(m => ((m.receiver.receiverId===userInfo._id) && m.unread))
-          //   .map(m => m._id);
+          // 如果已经滚动到底部，新消息到来时自动滚动到底部
+          if (scrolledToBottom) {
+            scrollToBottom();
+          }
 
-          // // 如果有未读消息，发送请求标记它们为已读
-          // if (unreadMessageIds.length > 0) {
-          //     axios.post('/api/setIsRead', { messageIds: unreadMessageIds });
-          // }
         };
       } catch (err) {
         console.log(err);
       }
     };
 
+    // 如果socket有新消息
     if (socket) {
       fetchMessage();
     }
@@ -119,24 +139,38 @@ function MessageContent({componentInfo}) {
 
 
 
+  if(isLoading){
+    return <CircularProgress />
+  };
+
   return (
     <WebSocketContext.Provider value={ws.current}>
-      <Container style={{ height: '100%' }}>
+      <Container style={{ height: '60vh', overflowY: 'auto', position: 'relative' }}>
         <div className="message-container">
 
-        <div className="message-area">
-          {message.length!==0 ? message.map((item)=>{
-            const isSentByCurrentUser=item.sender.senderId===userInfo._id;
-            const senderName=isSentByCurrentUser ? userInfo.username : componentInfo.friendInfo.username;
-            return <ChatMessage {...item} send={isSentByCurrentUser} key={item._id} senderName={senderName} />
-          }) : <p>还没有消息哦，发送点什么吧！</p>}
-        </div>
-
-        {/* 输入框区域 */}
-        <MessageInput {...userInfo} />
+          <div className="message-area">
+            {message.length!==0 ? message.map((item)=>{
+              const isSentByCurrentUser=item.sender.senderId===userInfo._id;
+              const senderName=isSentByCurrentUser ? userInfo.username : friendInfo.username;
+              return <ChatMessage {...item} send={isSentByCurrentUser} key={item._id} senderName={senderName} />
+            }) : <p>还没有消息哦，发送点什么吧！</p>}
+            <div ref={messageEndRef} />
+          </div>
 
         </div>
       </Container>
+
+      <Button
+        onClick={scrollToBottom}
+        style={{
+        margin: 'auto',
+        zIndex: 1  // 确保按钮在其他内容之上
+        }}
+      >
+        <ArrowDownwardIcon />
+      </Button>
+      <MessageInput idsInfo={idsInfo} scrollToBottom={scrollToBottom}/>
+      
     </WebSocketContext.Provider>
   );
 }
