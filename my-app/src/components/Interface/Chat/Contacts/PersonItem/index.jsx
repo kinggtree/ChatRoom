@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
+import { ListItemAvatar, Avatar, ListItemButton, ListItemText, Badge } from '@mui/material';
 import './styles.css';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { messageRead } from '../../../../reduxSlice/unreadContactSlice';
+import { messageRead } from '../../../../../reduxSlice/unreadContactSlice';
 import axios from 'axios';
 
-import PersonItem from './PersonItem';
-import GroupItem from './GroupItem';
 
-
-function ListButton({_id, username, profilePictureURL }) {
+function PersonItem({_id, username, profilePictureURL }) {
   const contactId=_id;
   let link=contactId;
 
@@ -56,32 +53,4 @@ function ListButton({_id, username, profilePictureURL }) {
   )
 }
 
-
-
-function Contacts() {
-  const fullContact=useSelector(state=>state.fullContact.item);
-  const contactStatus=useSelector(state=>state.fullContact.status);
-
-  const groupInfo=useSelector(state=>state.groupInfo.item);
-
-  if(contactStatus!=='succeeded'){
-    return <CircularProgress />
-  }
-
-  return (
-    <div>
-      <List component="nav" className="nav-list">
-        {fullContact.map((item)=>{
-          return <PersonItem key={item._id} {...item} className="nav-list-item" />
-        })}
-      </List>
-      <List component="nav" className="nav-list">
-        {groupInfo.map(group=>{
-          return <GroupItem key={group._id} {...group} className="nav-list-item" />
-        })}
-      </List>
-    </div>
-  )
-}
-
-export default Contacts;
+export default PersonItem;

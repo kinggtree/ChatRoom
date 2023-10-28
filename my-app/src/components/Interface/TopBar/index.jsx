@@ -6,12 +6,14 @@ import LogOut from "./LogOut";
 import AddFriend from "./AddFriend";
 
 import { useSelector } from 'react-redux';
+import CreateGroup from "./CreateGroup";
 
 
 function TopBar() {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
+  const [isNewGroupOpen, setIsNewGroupOpen]=useState(false);
 
   const userInfo=useSelector(state=>state.userInfo.item);
 
@@ -38,6 +40,11 @@ function TopBar() {
     handleClose();
   };
 
+  const openNewGroup=()=>{
+    setIsNewGroupOpen(true);
+    handleClose();
+  }
+
   return (
     <Toolbar className="top-bar">
       <Typography variant="h5" color="inherit" className="top-bar-welcome">
@@ -58,9 +65,12 @@ function TopBar() {
         <MenuItem onClick={toChat}>聊天</MenuItem>
         <MenuItem onClick={toProfile}>个人信息</MenuItem>
         <MenuItem onClick={openAddFriend}>添加好友</MenuItem>
+        <MenuItem onClick={openNewGroup}>创建新群组</MenuItem>
       </Menu>
 
       <AddFriend isOpen={isAddFriendOpen} setIsOpen={setIsAddFriendOpen}/>
+
+      <CreateGroup isOpen={isNewGroupOpen} setIsOpen={setIsNewGroupOpen}/>
       
       <LogOut />
     </Toolbar>

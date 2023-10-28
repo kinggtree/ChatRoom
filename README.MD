@@ -39,6 +39,7 @@
         │   │   │           └── WebSocketContext
         │   │   ├── TopBar
         │   │   │   ├── AddFriend
+        │   │   │   ├── CreateGroup
         │   │   │   └── LogOut
         │   │   └── UserProfile
         │   │       ├── EditInfo

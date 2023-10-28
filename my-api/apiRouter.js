@@ -13,6 +13,7 @@ mongoose.connect(process.env.EXPRESS_DATABASE_URL, {
 });
 const User=require("./schema/user");
 const Message=require('./schema/message');
+const Group=require('./schema/group');
 const { clearInterval } = require('timers');
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -448,6 +449,62 @@ router.post('/fullContact', function(req, res){
     })
 });
 
+
+// 创建新群组
+router.post('/createNewGroup', async function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+
+  try{
+    const groupMembers=req.body.groupMemberIds.map(id=>{
+      return {userId: new mongoose.Types.ObjectId(id), nickname: 'null'};
+    })
+  
+    let newGroup=await Group.create({
+      groupName: req.body.groupName,
+      groupMembers: groupMembers,
+      groupOwnerId: req.session._id,
+      groupProfilePictureName: 'default_group.jpg',
+      group_intro: 'A New Group.',
+      group_notice:[{content: 'Original Notice.'}]
+    });
+  
+    if(newGroup){
+      return res.status(200).send("成功创建群组");
+    } else {
+      return res.status(500).send("internal server error");
+    }
+  } catch(err) {
+    console.log(err);
+    return res.status(500).send("internal server error");
+  };
+});
+
+
+// 获取所有群组基础信息
+router.post('/getGroupInfo', function(req, res){
+  if(!req.session._id)
+    return res.status(401).send();
+
+  const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
+  
+  Group.find()
+    .select('groupName groupProfilePictureName')
+    .then(groups=>{
+      const simpleGroups=groups.map(group=>{
+        return {
+          _id: group._id.toString(),
+          groupName: group.groupName,
+          groupProfilePictureURL: URLPath+group.groupProfilePictureName
+        };
+      });
+      res.status(200).send({group: simpleGroups});
+    })
+    .catch(err=>{
+      console.log(err);
+      return res.status(500).send("internal server error");
+    })
+})
 
 
 // 由服务器主动发送未读提示

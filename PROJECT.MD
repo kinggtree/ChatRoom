@@ -147,3 +147,16 @@ let resData={
 }
 ```
 
+---
+
+### 12. 群组基础信息获取(groupInfo)
+```
+group: [
+  {
+    _id: group._id.toString(),
+    groupName: group.groupName,
+    groupProfilePictureURL: URLPath+group.groupProfilePictureName
+  }
+]
+
+```

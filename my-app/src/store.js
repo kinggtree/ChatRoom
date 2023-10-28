@@ -4,6 +4,7 @@ import personalReducer from './reduxSlice/personalInfoSlice';
 import friendInfoReducer from './reduxSlice/friendInfoSlice';
 import fullContactReducer from './reduxSlice/fullContactSlice';
 import unreadContactReducer from './reduxSlice/unreadContactSlice';
+import groupInfoReducer from './reduxSlice/groupInfoSlice';
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     personalInfo: personalReducer,
     friendInfo: friendInfoReducer,
     fullContact: fullContactReducer,
-    unreadContact: unreadContactReducer
+    unreadContact: unreadContactReducer,
+    groupInfo: groupInfoReducer
   }
 });
 

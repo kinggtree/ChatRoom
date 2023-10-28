@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserInfo } from "../../reduxActions/userInfoActions";
 import { fetchFullContact } from "../../reduxActions/fullContactActions";
 import axios from "axios";
+import { fetchGroupInfo } from "../../reduxActions/groupInfoActions";
 
 function Interface(){
 
@@ -17,6 +18,7 @@ function Interface(){
   const dispatch=useDispatch();
   const userInfoStatus=useSelector(state=>state.userInfo.status);
   const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
+  const groupInfoStatus=useSelector(state=>state.groupInfo.status);
   const [isLoading ,setIsLoading]=useState(true);
 
   const eventSourceRef=useRef(null);
@@ -39,6 +41,7 @@ function Interface(){
       })
 
     dispatch(fetchUserInfo());
+    dispatch(fetchGroupInfo());
 
     eventSourceRef.current=new EventSource('/api/serverSendNew');
 
@@ -72,6 +75,12 @@ function Interface(){
       setIsLoading(false);
     }
   }, [userInfoStatus]);
+
+  useEffect(()=>{
+    if(userInfoStatus==='succeeded' && groupInfoStatus==='succeeded'){
+      setIsLoading(false);
+    }
+  }, [userInfoStatus, groupInfoStatus]);
 
   if(isLoading) {
     return <CircularProgress />
