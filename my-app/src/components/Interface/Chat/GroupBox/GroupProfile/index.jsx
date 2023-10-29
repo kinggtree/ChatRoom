@@ -1,7 +1,9 @@
-import { CircularProgress, Typography } from "@mui/material";
+import { CircularProgress, Typography, Avatar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import './styles.css';
+import ManageGroupMembers from "./ManageGroupMember";
+import ManageNotice from "./ManageNotice";
 
 function GroupProfile() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,29 +25,17 @@ function GroupProfile() {
 
   return (
     <div className="group-profile">
-      <img
-        src={fullGroupInfo.groupProfilePictureURL || "default-profile-picture-url"}
+      <Avatar
+        src={fullGroupInfo.groupProfilePictureURL}
         alt={`${fullGroupInfo.groupName}'s profile picture`}
         className="profile-picture"
       />
       <Typography variant="h4" className="group-name">{fullGroupInfo.groupName}</Typography>
-      <Typography className="group-intro">群介绍: {fullGroupInfo.group_intro || "暂无介绍"}</Typography>
+      <Typography className="group-intro">群介绍: {fullGroupInfo.groupIntro || "暂无介绍"}</Typography>
       <Typography className="group-notice-title">群通知:</Typography>
-      <ul className="group-notices">
-        {fullGroupInfo.group_notice.length > 0 ? (
-          fullGroupInfo.group_notice.map((notice, index) => (
-            <li key={index} className="group-notice">{notice.content}</li>
-          ))
-        ) : (
-          <Typography className="no-notice">暂无通知</Typography>
-        )}
-      </ul>
+      <ManageNotice />
       <Typography className="group-members-title">群成员:</Typography>
-      <ul className="group-members">
-        {fullGroupInfo.groupMembers.map(member => (
-          <li key={member.userId} className="group-member">{member.userId || "匿名用户"}</li>
-        ))}
-      </ul>
+      <ManageGroupMembers />
     </div>
   );
 }

@@ -25,7 +25,7 @@ function ContactsItem({_id, username, profilePictureURL, dispatch}){
   const removeFriend=function(){
     axios.post('/api/unfriend', {friendId: _id})
     .then(()=>{
-        alert('remove successfully!');
+        alert('成功删除！');
         dispatch(fetchUserInfo());  // 会触发根组件的获取联系人信息
     }).catch((err)=>{
         console.log(err);
@@ -55,15 +55,15 @@ function ContactsItem({_id, username, profilePictureURL, dispatch}){
 
 function ManageContacts(){
   const [isSort, setIsSort]=useState(false);
-  const [isLoading, setIsLoading]=useState(true);
-  const [originalContact, setOriginalContact]=useState([]);
   const [orderedContact, setOrderedContact]=useState([]);
   const [usingContact, setUsingContact]=useState([]);
 
   const dispatch=useDispatch();
   const contacts=useSelector(state=>state.userInfo.item.contacts);
-  const fullContact=useSelector(state=>state.fullContact.item);
-  const loadingStatus=useSelector(state=>state.fullContact.status);
+  const fullContact=useSelector(state=>state.fullContact.item);   // 起始联系人目录
+  const contactStatus=useSelector(state=>state.fullContact.status);
+
+  const [isLoading, setIsLoading]=useState(true);
 
 
   const sortContact=(newContacts)=>{
@@ -81,26 +81,16 @@ function ManageContacts(){
   }
 
 
-  // 专门处理初始化加载
-  useEffect(() => {
-    // 如果fullContact已存在，初始化originalContact和orderedContact
-    if (fullContact && fullContact.length > 0) {
-      setOriginalContact(fullContact);
-      sortContact(fullContact); // 这里sortContact会设置orderedContact
-    } else {
-      // 如果fullContact不存在，发起API请求
+  useEffect(()=>{
+    if(contactStatus!=='succeeded'){
       dispatch(fetchFullContact(contacts));
-      console.log("API");
-    }
-  }, []);
-  
-
-  // 处理结果返回成功后
-  useEffect(() => {
-    if (loadingStatus === 'succeeded') {
+    } else {
+      setUsingContact(fullContact);   // 设置原始联系人列表（无序）
+      sortContact(fullContact);     // 列表排序
       setIsLoading(false);
     }
-  }, [loadingStatus]);
+  }, [contactStatus]);
+  
   
 
   // 处理排序状态的变化
@@ -108,7 +98,7 @@ function ManageContacts(){
     if (isSort) {
       setUsingContact(orderedContact);
     } else {
-      setUsingContact(originalContact);
+      setUsingContact(fullContact);
     }
   }, [isSort]);
 
@@ -117,7 +107,7 @@ function ManageContacts(){
     setIsSort(!isSort);
   }
 
-  if(loadingStatus!=='succeeded'){
+  if(isLoading){
     return <CircularProgress />
   }
 
@@ -130,7 +120,7 @@ function ManageContacts(){
       </IconButton>
     </Toolbar>
     <List component="nav" className="contacts">
-      {fullContact.map((item)=>{
+      {usingContact.map((item)=>{
         return <ContactsItem key={item._id} dispatch={dispatch} {...item} />
       })}
     </List>

@@ -7,7 +7,6 @@ export const fetchFullGroupInfo = createAsyncThunk(
     try {
       const response = await axios.post('/api/getFullGroupInfo', { groupId });
       const group = response.data;
-      const URLPath = process.env.EXPRESS_API_BASE_URL + "/static/profile_photos/";
 
       const initialMembers = {};
       if (Array.isArray(group.groupMembers)) {
@@ -20,7 +19,7 @@ export const fetchFullGroupInfo = createAsyncThunk(
         groupName: group.groupName,
         groupOwnerId: group.groupOwnerId,
         groupMembers: initialMembers,
-        groupProfilePictureURL: URLPath + group.groupProfilePictureName,
+        groupProfilePictureURL: group.groupProfilePictureURL,
         groupIntro: group.group_intro,
         groupNotice: group.group_notice,
       };
