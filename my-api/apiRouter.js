@@ -557,6 +557,7 @@ router.post('/getFullGroupInfo', async function (req, res) {
     }).filter(Boolean); // 过滤掉可能的undefined值
 
     const fullGroupInfo = {
+      _id: group._id,
       groupName: group.groupName,
       groupOwnerId: group.groupOwnerId,
       groupMembers: groupMemberFullInfo,
@@ -571,6 +572,62 @@ router.post('/getFullGroupInfo', async function (req, res) {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
+// 向群组中添加通知
+router.post('/addNotice', function(req, res){
+  if (!req.session._id)
+    return res.status(401).send();
+
+  const group_notice={'content': req.body.content};
+  Group.findOneAndUpdate(
+    {_id: req.body.groupId},
+    {$push:{'group_notice': group_notice}}
+  ).then(()=>{
+    res.status(200).send();
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('internal server error');
+  })
+});
+
+
+// 删除群组中的群通知
+router.post('/removeGroupNotice', async function(req, res) {
+  if (!req.session._id)
+    return res.status(401).send('Unauthorized');
+
+  const noticeId = req.body.noticeId;
+  const groupId = req.body.groupId; // 假设你会在请求体中发送要删除的通知所在的群组的ID
+
+  if (!noticeId || !groupId) {
+    return res.status(400).send('Bad Request: Missing parameters');
+  };
+
+  try {
+    // 查找群组
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).send('Group not found');
+    }
+
+    // 删除通知
+    const noticeIndex = group.group_notice.findIndex(notice => notice.id === noticeId);
+    if (noticeIndex === -1) {
+      return res.status(404).send('Notice not found');
+    }
+    group.group_notice.splice(noticeIndex, 1);
+
+    // 保存更改
+    await group.save();
+
+    res.status(200).send('Notice removed successfully');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('internal server error');
+  }
+});
+
 
 
 // 由服务器主动发送未读提示(SSE连接)

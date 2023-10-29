@@ -64,14 +64,17 @@ function MessageContent({idsInfo}) {
   // 实现按钮，消息滚动到最下面
   const messageEndRef=useRef(null);
 
+  // 触发滚动到底部
   const scrollToBottom=()=>{
     messageEndRef.current?.scrollIntoView({behavior: "smooth"});
   };
 
-  // 检查是否滚动到底部(目前这里还是有bug)
+  // 检查是否滚动到底部(目前这里还是有bug)(目前问题主要集中在element.scrollTop总是为0上)
   const isScrolledToBottom = (element) => {
-    return element.scrollHeight - element.scrollTop === element.clientHeight;
-  };  
+    const tolerance = 5; // 你可以根据需要调整这个容差值
+    return Math.abs(element.scrollHeight - element.scrollTop - element.clientHeight) < tolerance;
+  };
+  
 
 
   useEffect(()=>{
@@ -117,15 +120,7 @@ function MessageContent({idsInfo}) {
             newMessages = [receivedMessage];
           }
 
-          // 检查是否已经滚动到底部
-          const scrolledToBottom = isScrolledToBottom(messageEndRef.current.parentElement);
-
           setMessage(prevMessage => [...prevMessage, ...newMessages]);
-
-          // 如果已经滚动到底部，新消息到来时自动滚动到底部
-          if (scrolledToBottom) {
-            scrollToBottom();
-          }
 
         };
       } catch (err) {
@@ -138,6 +133,20 @@ function MessageContent({idsInfo}) {
       fetchMessage();
     }
   }, [socket]);
+
+
+  
+  useEffect(()=>{
+    if (messageEndRef.current) {
+      // 检查是否滚动到底部 
+      const scrolledToBottom = isScrolledToBottom(messageEndRef.current.parentElement);
+  
+      // 如果已经滚动到底部，新消息到来时自动滚动到底部
+      if (scrolledToBottom) {
+        scrollToBottom();
+      };
+    }
+  }, [message]);
 
 
 

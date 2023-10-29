@@ -16,6 +16,7 @@ export const fetchFullGroupInfo = createAsyncThunk(
       }
 
       const fullGroupInfo = {
+        _id: group._id,
         groupName: group.groupName,
         groupOwnerId: group.groupOwnerId,
         groupMembers: initialMembers,

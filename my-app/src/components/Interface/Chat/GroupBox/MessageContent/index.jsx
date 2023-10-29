@@ -81,6 +81,7 @@ function MessageContent({idsInfo}) {
   // 实现按钮，消息滚动到最下面
   const messageEndRef=useRef(null);
 
+  // 触发滚动到底部
   const scrollToBottom=()=>{
     messageEndRef.current?.scrollIntoView({behavior: "smooth"});
   };
@@ -112,6 +113,8 @@ function MessageContent({idsInfo}) {
     return () => {
       ws.current && ws.current.close();
       setMessage([]);
+      // 设置正在加载
+      setIsLoading(true);
     };
   },[idsInfo.groupId]);
 
@@ -133,15 +136,8 @@ function MessageContent({idsInfo}) {
             newMessages = [receivedMessage];
           }
 
-          // 检查是否已经滚动到底部
-          const scrolledToBottom = isScrolledToBottom(messageEndRef.current.parentElement);
-
           setMessage(prevMessage => [...prevMessage, ...newMessages]);
 
-          // 如果已经滚动到底部，新消息到来时自动滚动到底部
-          if (scrolledToBottom) {
-            scrollToBottom();
-          }
 
         };
       } catch (err) {
@@ -161,6 +157,17 @@ function MessageContent({idsInfo}) {
     };
   }, [socket]);
 
+  useEffect(()=>{
+    if (messageEndRef.current) {
+      // 检查是否滚动到底部 
+      const scrolledToBottom = isScrolledToBottom(messageEndRef.current.parentElement);
+  
+      // 如果已经滚动到底部，新消息到来时自动滚动到底部
+      if (scrolledToBottom) {
+        scrollToBottom();
+      };
+    }
+  }, [message]);
 
 
   if(isLoading){

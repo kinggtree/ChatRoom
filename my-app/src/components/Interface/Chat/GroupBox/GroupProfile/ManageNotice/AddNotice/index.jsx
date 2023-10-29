@@ -5,11 +5,11 @@ import axios from "axios";
 
 
 // 添加好友组件
-function AddNotice({ isOpen, setIsOpen, dispatchFullGroupInfo }) {
+function AddNotice({ groupId, isOpen, setIsOpen, dispatchFullGroupInfo }) {
   const[content, setContent]=useState('');
 
   const handleSubmit=function(){
-    axios.post('/api/addNotice', {'groupId': groupId})
+    axios.post('/api/addNotice', {'groupId': groupId, 'content': content})
       .then(function(response){
         if(response.status===200){
           alert("添加通知完成");
