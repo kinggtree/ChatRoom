@@ -41,6 +41,9 @@
         │   │   │   │       └── WebSocketContext
         │   │   │   └── GroupBox
         │   │   │       ├── GroupProfile
+        │   │   │       │   ├── ManageGroupMember
+        │   │   │       │   └── ManageNotice
+        │   │   │       │       └── AddNotice
         │   │   │       └── MessageContent
         │   │   │           ├── MessageInput
         │   │   │           └── WebSocketContext
