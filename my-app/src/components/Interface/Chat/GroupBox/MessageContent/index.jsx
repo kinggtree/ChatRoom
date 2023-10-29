@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, CircularProgress, Container } from "@mui/material";
+import { Avatar, Button, CircularProgress, Container } from "@mui/material";
 import MessageInput from "./MessageInput";
 import './styles.css';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 const {REACT_APP_API_BASE_URL}=process.env;
 
 
-function ChatMessage({ message, send, senderName }) {
+function ChatMessage({ message, send, senderName, senderAvatarURL }) {
   const isSentByCurrentUser = send;
 
   const style = {
@@ -18,13 +18,18 @@ function ChatMessage({ message, send, senderName }) {
       alignItems: isSentByCurrentUser ? 'flex-end' : 'flex-start',
       marginBottom: '4px'
     },
+    messageContainer: {
+      display: 'flex',
+      flexDirection: isSentByCurrentUser ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      maxWidth: '400px',
+    },
     chatMessage: {
       backgroundColor: '#f8f8f8',
       border: '1px solid #ddd',
-      borderRadius: isSentByCurrentUser ? '25% 10%' : '10% 25%',
-      padding: '2px',
-      margin: '2px 0',
-      maxWidth: '400px',
+      borderRadius: '15px',
+      padding: '8px',
+      margin: isSentByCurrentUser ? '0 8px 0 0' : '0 0 0 8px', // Add margin to create space between the avatar and the message
     },
     senderAndReceiver: {
       fontWeight: 'bold',
@@ -34,17 +39,29 @@ function ChatMessage({ message, send, senderName }) {
     messageContent: {
       margin: '7px',
     },
+    avatar: {
+      width: '40px',
+      height: '40px',
+      borderRadius: '50%', // Make the avatar circular
+    },
   };
 
   return (
     <div style={style.chatContainer}>
       <p style={style.senderAndReceiver}>{senderName}</p>
-      <div style={style.chatMessage}>
-        <p style={style.messageContent}>{message.messageContent}</p>
+      <div style={style.messageContainer}>
+        <Avatar
+          alt={senderName + "'s profile picture."}
+          src={senderAvatarURL}
+          size="40px" // Assuming your Avatar component accepts a size prop
+        />
+        <div style={style.chatMessage}>
+          <p style={style.messageContent}>{message.messageContent}</p>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 
 
@@ -56,10 +73,10 @@ function MessageContent({idsInfo}) {
   const [message, setMessage]=useState([]);
 
   const userInfo=useSelector(state=>state.userInfo.item);
-  const friendInfo=useSelector(state=>state.friendInfo.item);
+  const fullGroupInfo=useSelector(state=>state.fullGroupInfo.item);
 
+  const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading]=useState(true);
-  const [isConnected, setIsConnected]=useState(false);
 
   // 实现按钮，消息滚动到最下面
   const messageEndRef=useRef(null);
@@ -74,10 +91,11 @@ function MessageContent({idsInfo}) {
   };  
 
 
+  // 建立群组连接
   useEffect(()=>{
     const senderId=idsInfo.senderId;
-    const receiverId=idsInfo.receiverId;
-    ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${receiverId}&isGroup=false`);
+    const groupId=idsInfo.groupId;
+    ws.current=new WebSocket(`ws://${REACT_APP_API_BASE_URL}?senderId=${senderId}&receiverId=${groupId}&isGroup=true`);
 
     ws.current.onerror=(error)=>{
       console.log(error);
@@ -85,8 +103,8 @@ function MessageContent({idsInfo}) {
     }
 
     ws.current.onopen=()=>{
-      setIsLoading(false);
       setIsConnected(true);
+      setIsLoading(false);
       setSocket(ws.current);
     }
     
@@ -94,11 +112,8 @@ function MessageContent({idsInfo}) {
     return () => {
       ws.current && ws.current.close();
       setMessage([]);
-      // 设置正在加载
-      setIsLoading(true);
     };
-  },[idsInfo.receiverId]);
-
+  },[idsInfo.groupId]);
 
 
   // 获取新消息，添加到目前的消息列表并渲染
@@ -109,6 +124,7 @@ function MessageContent({idsInfo}) {
         socket.onmessage = function(event) {
           const receivedMessage = JSON.parse(event.data);
           let newMessages = [];
+          console.log(receivedMessage);
 
           // 如果第一次获取所有消息，这个时候后端会发送一个叫messages的数组
           if (receivedMessage.messages) {
@@ -136,7 +152,13 @@ function MessageContent({idsInfo}) {
     // 如果socket有新消息
     if (socket && isConnected) {
       fetchMessage();
-    }
+    };
+
+    return ()=>{
+      if(socket){
+        socket.onmessage=null;
+      }
+    };
   }, [socket]);
 
 
@@ -153,9 +175,10 @@ function MessageContent({idsInfo}) {
           <div className="message-area">
             {message.length!==0 ? message.map((item)=>{
               const isSentByCurrentUser=item.sender.senderId===userInfo._id;
-              const senderName=isSentByCurrentUser ? userInfo.username : friendInfo.username;
-              return <ChatMessage {...item} send={isSentByCurrentUser} key={item._id} senderName={senderName} />
-            }) : <p>还没有消息哦，发送点什么吧！</p>}
+              const senderName=fullGroupInfo.groupMembers[item.sender.senderId].name;
+              const senderAvatarURL=fullGroupInfo.groupMembers[item.sender.senderId].profilePictureURL;
+              return <ChatMessage {...item} send={isSentByCurrentUser} key={item._id} senderName={senderName} senderAvatarURL={senderAvatarURL} />
+            }) : <p>群组内还没有什么消息哦，发送点什么吧！</p>}
             <div ref={messageEndRef} />
           </div>
 

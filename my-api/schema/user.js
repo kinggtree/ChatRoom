@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
       _id: false,
       contactId: mongoose.Schema.Types.ObjectId,
     }
+  ],
+  groups: [
+    {
+      _id: false,
+      groupId: mongoose.Schema.Types.ObjectId,
+    }
   ]
 });
 

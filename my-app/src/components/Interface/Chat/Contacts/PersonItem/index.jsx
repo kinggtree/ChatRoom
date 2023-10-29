@@ -10,7 +10,7 @@ import axios from 'axios';
 
 function PersonItem({_id, username, profilePictureURL }) {
   const contactId=_id;
-  let link=contactId;
+  let link="friend/"+contactId;
 
   const unreadObj=useSelector(state=>state.unreadContact.item[contactId]);
 

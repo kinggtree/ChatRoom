@@ -6,22 +6,22 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import ChatIcon from '@mui/icons-material/Chat';
 
-import FriendProfile from "./FriendProfile";
+import GroupProfile from "./GroupProfile";
 import MessageContent from "./MessageContent";
 
 import { useSelector, useDispatch } from "react-redux";
-import { fetchFriendInfo } from "../../../../reduxActions/friendActions";
+import { fetchFullGroupInfo } from "../../../../reduxActions/fullGroupInfoActions";
 
 import './styles.css';
 
 
 // 聊天框部分
-function FriendBox() {
+function GroupBox() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLoading, setIsLoading]=useState(true);
   const [idsInfo, setIdsInfo] = useState({
     senderId: '',
-    receiverId: '',
+    groupId: '',
   });
   const open = Boolean(anchorEl);
   const location=useLocation();
@@ -29,40 +29,40 @@ function FriendBox() {
 
   const dispatch=useDispatch();
   const userInfo=useSelector(state=>state.userInfo.item);
-  const friendInfo=useSelector(state=>state.friendInfo.item);
-  const friendInfoStatus=useSelector(state=>state.friendInfo.status);
+  const fullGroupInfo=useSelector(state=>state.fullGroupInfo.item);
+  const fullGroupInfoStatus=useSelector(state=>state.fullGroupInfo.status);
 
 
   const senderId = userInfo._id;
-  const {user_id} = useParams();
+  const {group_id} = useParams();
 
   // 获取启动聊天框所需信息
   useEffect(()=>{
     setIsLoading(true);
-    dispatch(fetchFriendInfo(user_id));
+    dispatch(fetchFullGroupInfo(group_id));
   },[location.pathname]);
 
   useEffect(()=>{
-    if(friendInfoStatus==='succeeded'){
+    if(fullGroupInfoStatus==='succeeded'){
       setIdsInfo({
         senderId: senderId,
-        receiverId: user_id,
+        groupId: group_id,
       });
       setIsLoading(false);
     }
-  }, [friendInfoStatus])
+  }, [fullGroupInfoStatus]);
 
-  const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
-  const closeFriendMenu=()=>setAnchorEl(null);
+  const openGroupMenu=(event)=>setAnchorEl(event.currentTarget);
+  const closeGroupMenu=()=>setAnchorEl(null);
 
-  const toFriendInfo=()=>{
-    navigate('friendProfile');
-    closeFriendMenu();
+  const toGroupInfo=()=>{
+    navigate('groupProfile');
+    closeGroupMenu();
   }
 
   const toChat=()=>{
     navigate('');
-    closeFriendMenu();
+    closeGroupMenu();
   }
 
   if(isLoading){
@@ -75,7 +75,7 @@ function FriendBox() {
 
           <Toolbar className="chat-topbar">
             <Typography variant="h6" className="friend-name">
-              {friendInfo.username}
+              {fullGroupInfo.groupName}
             </Typography>
 
             <IconButton 
@@ -84,7 +84,7 @@ function FriendBox() {
               aria-controls={open ? 'friend-menu' : undefined}
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
-              onClick={openFriendMenu} 
+              onClick={openGroupMenu} 
               className="more-button">
               <MoreVertIcon />
             </IconButton>
@@ -93,13 +93,13 @@ function FriendBox() {
               id="friend-menu" 
               anchorEl={anchorEl}
               open={open} 
-              onClose={closeFriendMenu}
+              onClose={closeGroupMenu}
             >
-              <MenuItem onClick={toFriendInfo}>
+              <MenuItem onClick={toGroupInfo}>
                 <ListItemIcon>
                   <PermIdentityIcon />
                 </ListItemIcon>
-                <ListItemText>好友信息</ListItemText>
+                <ListItemText>群组信息</ListItemText>
               </MenuItem>
 
               <MenuItem onClick={toChat}>
@@ -121,8 +121,8 @@ function FriendBox() {
             />
 
             <Route
-              path="/friendProfile"
-              element={<FriendProfile />}
+              path="/groupProfile"
+              element={<GroupProfile />}
             />
           </Routes>
 
@@ -131,4 +131,4 @@ function FriendBox() {
   );
 }
 
-export default FriendBox;
+export default GroupBox;

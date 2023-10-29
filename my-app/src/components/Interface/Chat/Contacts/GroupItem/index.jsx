@@ -10,7 +10,7 @@ import axios from 'axios';
 
 function GroupItem({_id, groupName, groupProfilePictureURL }) {
   const groupId=_id;
-  let link=groupId;
+  let link='group/'+groupId;
 
   const unreadObj=useSelector(state=>state.unreadContact.item[groupId]);
 

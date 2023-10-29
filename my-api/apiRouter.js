@@ -174,6 +174,7 @@ router.post('/getUserInfo', function(req, res) {
       res.status(200).send({
         'username': response.username,
         'contacts': response.contacts,
+        'groups': response.groups,
         '_id': req.session._id
       });
     }).catch((err)=>{
@@ -224,7 +225,7 @@ router.post('/unfriend',async function(req, res){
     // 删除我方的这个好友
     await User.findOneAndUpdate(
       {_id: req.session._id},
-      {$pull: {contacts: {contactId: req.body.friendId}}},      // 10.17 16:29 修改了这里
+      {$pull: {contacts: {contactId: req.body.friendId}}},
       {new: true, useFindAndModify: false}
     ).catch((err)=>{
       console.log(err);
@@ -457,8 +458,9 @@ router.post('/createNewGroup', async function(req, res){
 
   try{
     const groupMembers=req.body.groupMemberIds.map(id=>{
-      return {userId: new mongoose.Types.ObjectId(id), nickname: 'null'};
-    })
+      return {userId: new mongoose.Types.ObjectId(id), nickname: ''};
+    });
+    groupMembers.push({userId: new mongoose.Types.ObjectId(req.session._id), nickname: ''});
   
     let newGroup=await Group.create({
       groupName: req.body.groupName,
@@ -468,7 +470,13 @@ router.post('/createNewGroup', async function(req, res){
       group_intro: 'A New Group.',
       group_notice:[{content: 'Original Notice.'}]
     });
-  
+
+    const groupMemberIds=groupMembers.map(member=>member.userId);
+    await User.updateMany(
+      {_id: {$in: groupMemberIds}},
+      {$push: {groups: {groupId: newGroup._id}}}
+    );
+
     if(newGroup){
       return res.status(200).send("成功创建群组");
     } else {
@@ -488,7 +496,9 @@ router.post('/getGroupInfo', function(req, res){
 
   const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
   
-  Group.find()
+  const groupIds = req.body.groups.map(group => group.groupId);
+
+  Group.find({_id: {$in: groupIds}})
     .select('groupName groupProfilePictureName')
     .then(groups=>{
       const simpleGroups=groups.map(group=>{
@@ -503,10 +513,11 @@ router.post('/getGroupInfo', function(req, res){
     .catch(err=>{
       console.log(err);
       return res.status(500).send("internal server error");
-    })
+    });
 });
 
-router.post('/getFullGroupInfo', function(req, res) {
+// 获取一个群组的所有信息
+router.post('/getFullGroupInfo', async function (req, res) {
   if (!req.session._id)
     return res.status(401).send();
 
@@ -515,31 +526,54 @@ router.post('/getFullGroupInfo', function(req, res) {
 
   const URLPath = process.env.EXPRESS_API_BASE_URL + "/static/profile_photos/";
 
-  Group.findOne({ _id: req.body.groupId })
-    .then(group => {
-      if (!group) {
-        return res.status(404).send('未找到该组');
+  try {
+    const group = await Group.findOne({ _id: req.body.groupId });
+    if (!group) {
+      return res.status(404).send('未找到该组');
+    }
+
+    // 获取所有成员的userId
+    const userIds = group.groupMembers.map(member => member.userId);
+
+    // 一次性从数据库中查询所有成员的详细信息
+    const users = await User.find({ '_id': { $in: userIds } });
+
+    // 创建一个以userId为键，用户数据为值的对象，方便查找
+    const userById = users.reduce((acc, user) => {
+      acc[user._id] = user;
+      return acc;
+    }, {});
+
+    // 处理每个成员的数据
+    const groupMemberFullInfo = group.groupMembers.map(member => {
+      const theMember = userById[member.userId];
+      if (theMember) {
+        return {
+          "_id": theMember._id,
+          "name": member.nickname === '' ? theMember.username : member.nickname,
+          "profilePictureURL": URLPath + theMember.profilePictureName,
+        };
       }
+    }).filter(Boolean); // 过滤掉可能的undefined值
 
-      const fullGroupInfo = {
-        groupName: group.groupName,
-        groupOwnerId: group.groupOwnerId,
-        groupMembers: group.groupMembers,
-        groupProfilePictureURL: URLPath + group.groupProfilePictureName,
-        group_intro: group.group_intro,
-        group_notice: group.group_notice
-      };
+    const fullGroupInfo = {
+      groupName: group.groupName,
+      groupOwnerId: group.groupOwnerId,
+      groupMembers: groupMemberFullInfo,
+      groupProfilePictureURL: URLPath + group.groupProfilePictureName,
+      group_intro: group.group_intro,
+      group_notice: group.group_notice
+    };
 
-      res.status(200).json(fullGroupInfo);
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).send('Internal Server Error');
-    });
+    res.status(200).json(fullGroupInfo);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 
-// 由服务器主动发送未读提示
+// 由服务器主动发送未读提示(SSE连接)
 router.get('/serverSendNew', async function(req, res) {
   if (!req.session._id) {
     return res.status(401).send('Unauthorized');

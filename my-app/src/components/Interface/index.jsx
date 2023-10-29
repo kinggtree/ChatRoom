@@ -19,6 +19,7 @@ function Interface(){
   const dispatch=useDispatch();
   const userInfoStatus=useSelector(state=>state.userInfo.status);
   const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
+  const userInfoGroups=useSelector(state=>state.userInfo.item.groups);
   const groupInfoStatus=useSelector(state=>state.groupInfo.status);
   const groupInfo=useSelector(state=>state.groupInfo.item);
   const unreadContactStatus=useSelector(state=>state.unreadContact.status);
@@ -29,7 +30,7 @@ function Interface(){
 
 
   useEffect(()=>{
-
+    // 测试连接和登录情况
     axios.post('/api/ping')
       .then(res=>{
         if(res.status===200)
@@ -44,56 +45,65 @@ function Interface(){
         navigate('/');
       })
 
+    // 获取userInfo和GroupInfo
     dispatch(fetchUserInfo());
-    dispatch(fetchGroupInfo());
-
-    eventSourceRef.current=new EventSource('/api/serverSendNew');
-
-    // 当有新消息的时候，向unreadContact里面的state加入新消息
-    eventSourceRef.current.onmessage=event=>{
-      const data = JSON.parse(event.data);
-      // 这里也可以选择导入unreadContactSlice.js里面的action
-      dispatch({ type: 'unreadContact/newMessageReceived', payload: data })
-    };
-
-    eventSourceRef.current.onerror = error => {
-      console.error("SSE error.");
-    };
-
-    // 组件卸载的时候断开连接
-    return () => {
-      if (eventSourceRef.current) {
-        console.log("trying to disconnect...");
-        eventSourceRef.current.close();
-        console.log("sended close req...");
-      }
-    };
-    
 
   }, [dispatch]); // 该组件在dispatch变化时重新渲染
 
+  // 获取用户所在的群的消息
+  useEffect(()=>{
+    if(userInfoStatus==='succeeded') {
+      dispatch(fetchGroupInfo(userInfoGroups));
+    }
+  }, [userInfoStatus])
   
   // 当联系人名单和群组信息名单加载完成后，初始化未读联系人名单
   useEffect(()=>{
-    if(userInfoStatus==='succeeded' && groupInfoStatus==='succeeded'){
+    if(groupInfoStatus==='succeeded'){
       // 获取完整联系人名单
       dispatch(fetchFullContact(userInfoContact));
       // 初始化未读状态
-      const totalContact=userInfoContact.map(userInfo=>{
+      const totalContactId=userInfoContact.map(userInfo=>{
         return userInfo.contactId;
       })
       groupInfo.map(group=>{
-        totalContact.push(group._id);
+        totalContactId.push(group._id);
       })
-      dispatch(initialUnreadContacts(totalContact));
+      dispatch(initialUnreadContacts(totalContactId));
     }
-  }, [userInfoStatus, groupInfoStatus]);
+  }, [groupInfoStatus]);
 
   // 当未读联系人列表加载成功后取消loading状态
   useEffect(()=>{
     if(unreadContactStatus==='succeeded')
       setIsLoading(false);
   }, [unreadContactStatus]);
+
+  useEffect(()=>{
+    if(unreadContactStatus==='succeeded'){
+      eventSourceRef.current=new EventSource('/api/serverSendNew');
+
+      // 当有新消息的时候，向unreadContact里面的state加入新消息
+      eventSourceRef.current.onmessage=event=>{
+        const data = JSON.parse(event.data);
+        // 这里也可以选择导入unreadContactSlice.js里面的action
+        dispatch({ type: 'unreadContact/newMessageReceived', payload: data })
+      };
+  
+      eventSourceRef.current.onerror = () => {
+        console.error("SSE error.");
+      };
+    };
+
+    return () => {
+      // 组件卸载的时候断开连接
+      if (eventSourceRef.current) {
+        console.log("trying to disconnect...");
+        eventSourceRef.current.close();
+        console.log("sended close req...");
+      }
+    };
+  }, [unreadContactStatus])
 
   if(isLoading) {
     return <CircularProgress />

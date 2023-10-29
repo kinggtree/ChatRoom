@@ -32,8 +32,15 @@
         │   ├── Interface
         │   │   ├── Chat
         │   │   │   ├── Contacts
-        │   │   │   └── FriendBox
-        │   │   │       ├── FriendProfile
+        │   │   │   │   ├── GroupItem
+        │   │   │   │   └── PersonItem
+        │   │   │   ├── FriendBox
+        │   │   │   │   ├── FriendProfile
+        │   │   │   │   └── MessageContent
+        │   │   │   │       ├── MessageInput
+        │   │   │   │       └── WebSocketContext
+        │   │   │   └── GroupBox
+        │   │   │       ├── GroupProfile
         │   │   │       └── MessageContent
         │   │   │           ├── MessageInput
         │   │   │           └── WebSocketContext

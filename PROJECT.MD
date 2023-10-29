@@ -1,30 +1,43 @@
 # 部分变量及API格式详情
 
 #### 1. 数据库中users的储存格式：
-```
+```js
 {
-  username: req.body.newUsername,
-  password: req.body.newPassword,
-  contacts:[],
-  self_intro: 'introduce to yourself!',
-  gender: '',
-  profilePictureName: 'default.png'
+  username: {type: String, unique: true},
+  password: String,
+  profilePictureName: String,
+  self_intro: String,
+  gender: String,
+  like: {type: Number, default: 0},
+  contacts: [
+    {
+      _id: false,
+      contactId: mongoose.Schema.Types.ObjectId,
+    }
+  ],
+  groups: [
+    {
+      _id: false,
+      groupId: mongoose.Schema.Types.ObjectId,
+    }
+  ]
 }
 ```
 
 ---
 
 #### 2. ChatInterface中的userInfo:
-```
+```js
 {
   'username': req.session.username,
   'contacts': response.contacts,
+  'groups': response.groups,
   '_id': req.session._id
 }
 ```
 
 其中，contacts为一个数组，里面储存的是对象：
-```
+```js
 {
   contactId: req.session._id
 }
@@ -33,7 +46,7 @@
 ---
 
 #### 3. 新消息的格式：
-```
+```js
 {
   sender: {
     senderId: new mongoose.Types.ObjectId('')
@@ -53,7 +66,7 @@
 ---
 
 #### 4. personalProfile API 返回数据包含：
-```
+```js
 {
   'username': req.session.username,
   'profilePictureURL': "http://localhost:5000/static/profile_photos/"+response.profilePictureName,
@@ -68,33 +81,36 @@
 ---
 
 #### 5. 建立websocket后初始化数据内容：
-```
+```js
 let messageContent={
   'message': {},
 };
 ```
 
 ---
-### 6. key.txt
+#### 6. key.txt
 
 该文件中16位字符串用于注册。每整点自动刷新
 目录：/my-api/key.txt
 
 ---
 
-### 7. EXPRESS_API_BASE_URL
+#### 7. EXPRESS_API_BASE_URL
 
 如果不在系统变量中设置，则其会自动使用/my-api/.env中的参数
 
 推荐设置一下，设置方法：
 
+```bash
 export EXPRESS_API_BASE_URL=......
+
+```
 
 ---
 
-### 8. getFriendInfo API 返回内容
+#### 8. getFriendInfo API 返回内容
 
-```
+```js
 let resData={
   _id: '',
   username: '',
@@ -107,25 +123,25 @@ let resData={
 
 ---
 
-### 9. getUnread API 
+#### 9. getUnread API 
 
 发送内容
 
-```
+```js
 {'sender.senderId': req.body.receiverId, 'receiver.receiverId': req.body.senderId}
 ```
 
 返回内容
 
-```
+```js
 {unread: true}
 ```
 
 ---
 
-### 10. fullContact API 返回数组内每个元素的格式
+#### 10. fullContact API 返回数组内每个元素的格式
 
-```
+```js
 {
   _id: item._id,
   username: item.username,
@@ -136,9 +152,9 @@ let resData={
 
 ---
 
-### 11. Redux中unreadContact 状态内容
+#### 11. Redux中unreadContact 状态内容
 
-```
+```js
 {
   state[contactId]={
     unreadCount: 0,
@@ -149,9 +165,9 @@ let resData={
 
 ---
 
-### 12. 群组基础信息获取(groupInfo)
-```
-group: [
+#### 12. 群组基础信息获取(groupInfo)
+```js
+const group: [
   {
     _id: group._id.toString(),
     groupName: group.groupName,
@@ -161,8 +177,8 @@ group: [
 
 ```
 
-## 13. 群组完整信息获取(fullGroupInfo)
-```
+#### 13. 群组完整信息获取(fullGroupInfo)
+```js
 const fullGroupInfo = {
   groupName: group.groupName,
   groupOwnerId: group.groupOwnerId,

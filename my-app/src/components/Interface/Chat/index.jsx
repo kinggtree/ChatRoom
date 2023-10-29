@@ -5,6 +5,7 @@ import {Grid, Paper, Typography, useMediaQuery, useTheme, Button, Drawer, Box, C
 import { Route, Routes } from "react-router-dom";
 
 import './styles.css'
+import GroupBox from './GroupBox';
 
 function Chat(){
   const theme = useTheme();
@@ -54,8 +55,12 @@ function Chat(){
                 } 
               />
               <Route
-                path=":user_id/*"
+                path="friend/:user_id/*"
                 element={<FriendBox />} 
+              />
+              <Route
+                path="group/:group_id/*"
+                element={<GroupBox />}
               />
             </Routes>
           </div>
