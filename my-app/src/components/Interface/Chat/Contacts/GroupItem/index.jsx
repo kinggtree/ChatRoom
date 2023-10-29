@@ -9,10 +9,10 @@ import axios from 'axios';
 
 
 function GroupItem({_id, groupName, groupProfilePictureURL }) {
-  const contactId=_id;
-  let link=contactId;
+  const groupId=_id;
+  let link=groupId;
 
-  const unreadObj=useSelector(state=>state.unreadContact[contactId]);
+  const unreadObj=useSelector(state=>state.unreadContact.item[groupId]);
 
   const [isUnread, setIsUnread]=useState(false);
   const dispatch=useDispatch();
@@ -26,12 +26,14 @@ function GroupItem({_id, groupName, groupProfilePictureURL }) {
   const handleClick=()=>{
     if(isUnread){
       dispatch(messageRead({
-        senderId: contactId
+        senderId: groupId
       }));
       setIsUnread(false);
       axios.post('/api/setIsRead', {messageIds: unreadObj.messageIds});
     }
   }
+
+
 
   return (
     <ListItemButton component={Link} to={link} onClick={handleClick}>

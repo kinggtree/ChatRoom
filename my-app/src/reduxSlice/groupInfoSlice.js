@@ -1,4 +1,4 @@
-import { fetchFriendInfo } from '../reduxActions/friendActions';
+import { fetchGroupInfo } from "../reduxActions/groupInfoActions";
 import { createSlice } from "@reduxjs/toolkit";
 
 const groupInfoSlice=createSlice({
@@ -10,14 +10,14 @@ const groupInfoSlice=createSlice({
   },
   extraReducers: builder=>{
     builder
-      .addCase(fetchFriendInfo.pending, state=>{
+      .addCase(fetchGroupInfo.pending, state=>{
         state.status='loading';
       })
-      .addCase(fetchFriendInfo.fulfilled, (state, action)=>{
+      .addCase(fetchGroupInfo.fulfilled, (state, action)=>{
         state.status='succeeded';
         state.item=action.payload;
       })
-      .addCase(fetchFriendInfo.rejected, (state, action)=>{
+      .addCase(fetchGroupInfo.rejected, (state, action)=>{
         state.status='failed';
         state.error=action.error.message;
       });

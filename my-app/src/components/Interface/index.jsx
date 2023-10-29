@@ -10,6 +10,7 @@ import { fetchUserInfo } from "../../reduxActions/userInfoActions";
 import { fetchFullContact } from "../../reduxActions/fullContactActions";
 import axios from "axios";
 import { fetchGroupInfo } from "../../reduxActions/groupInfoActions";
+import { initialUnreadContacts } from '../../reduxActions/unreadContactActions';
 
 function Interface(){
 
@@ -19,6 +20,9 @@ function Interface(){
   const userInfoStatus=useSelector(state=>state.userInfo.status);
   const userInfoContact=useSelector(state=>state.userInfo.item.contacts);
   const groupInfoStatus=useSelector(state=>state.groupInfo.status);
+  const groupInfo=useSelector(state=>state.groupInfo.item);
+  const unreadContactStatus=useSelector(state=>state.unreadContact.status);
+
   const [isLoading ,setIsLoading]=useState(true);
 
   const eventSourceRef=useRef(null);
@@ -68,19 +72,28 @@ function Interface(){
 
   }, [dispatch]); // 该组件在dispatch变化时重新渲染
 
-  useEffect(()=>{
-    if(userInfoStatus==='succeeded'){
-      dispatch(fetchFullContact(userInfoContact));
-      dispatch({type:'unreadContact/initialUnreadContact', payload: userInfoContact});
-      setIsLoading(false);
-    }
-  }, [userInfoStatus]);
-
+  
+  // 当联系人名单和群组信息名单加载完成后，初始化未读联系人名单
   useEffect(()=>{
     if(userInfoStatus==='succeeded' && groupInfoStatus==='succeeded'){
-      setIsLoading(false);
+      // 获取完整联系人名单
+      dispatch(fetchFullContact(userInfoContact));
+      // 初始化未读状态
+      const totalContact=userInfoContact.map(userInfo=>{
+        return userInfo.contactId;
+      })
+      groupInfo.map(group=>{
+        totalContact.push(group._id);
+      })
+      dispatch(initialUnreadContacts(totalContact));
     }
   }, [userInfoStatus, groupInfoStatus]);
+
+  // 当未读联系人列表加载成功后取消loading状态
+  useEffect(()=>{
+    if(unreadContactStatus==='succeeded')
+      setIsLoading(false);
+  }, [unreadContactStatus]);
 
   if(isLoading) {
     return <CircularProgress />

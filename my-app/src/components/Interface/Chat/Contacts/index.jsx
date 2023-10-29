@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge } from '@mui/material';
+import { List, ListItemAvatar, Avatar, ListItemButton, ListItemText, CircularProgress, Badge, ListItem } from '@mui/material';
 import './styles.css';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -70,16 +70,23 @@ function Contacts() {
 
   return (
     <div>
-      <List component="nav" className="nav-list">
+      {fullContact.length ? <List component="nav" className="nav-list">
         {fullContact.map((item)=>{
           return <PersonItem key={item._id} {...item} className="nav-list-item" />
         })}
-      </List>
+      </List> : <List>
+        <ListItem className='nav-list-item'>添加一些好友吧！</ListItem>
+      </List>}
+      
+      {groupInfo.length ? 
       <List component="nav" className="nav-list">
         {groupInfo.map(group=>{
           return <GroupItem key={group._id} {...group} className="nav-list-item" />
         })}
-      </List>
+      </List> : <List>
+        <ListItem className='nav-list-item'>加入一些群吧！</ListItem>
+      </List>}
+      
     </div>
   )
 }

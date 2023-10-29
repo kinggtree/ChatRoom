@@ -498,13 +498,45 @@ router.post('/getGroupInfo', function(req, res){
           groupProfilePictureURL: URLPath+group.groupProfilePictureName
         };
       });
-      res.status(200).send({group: simpleGroups});
+      res.status(200).send(simpleGroups);
     })
     .catch(err=>{
       console.log(err);
       return res.status(500).send("internal server error");
     })
-})
+});
+
+router.post('/getFullGroupInfo', function(req, res) {
+  if (!req.session._id)
+    return res.status(401).send();
+
+  if (!req.body.groupId)
+    return res.status(400).send('无效的请求，缺少组ID');
+
+  const URLPath = process.env.EXPRESS_API_BASE_URL + "/static/profile_photos/";
+
+  Group.findOne({ _id: req.body.groupId })
+    .then(group => {
+      if (!group) {
+        return res.status(404).send('未找到该组');
+      }
+
+      const fullGroupInfo = {
+        groupName: group.groupName,
+        groupOwnerId: group.groupOwnerId,
+        groupMembers: group.groupMembers,
+        groupProfilePictureURL: URLPath + group.groupProfilePictureName,
+        group_intro: group.group_intro,
+        group_notice: group.group_notice
+      };
+
+      res.status(200).json(fullGroupInfo);
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    });
+});
 
 
 // 由服务器主动发送未读提示

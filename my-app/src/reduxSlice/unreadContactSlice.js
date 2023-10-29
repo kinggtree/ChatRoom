@@ -1,42 +1,49 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { initialUnreadContacts } from "../reduxActions/unreadContactActions";
 
-const unreadContactSlice=createSlice({
+const unreadContactSlice = createSlice({
   name: 'unreadContact',
-  initialState: {},
+  initialState: {
+    item: {},
+    status: 'idle',
+    error: null
+  },
   reducers: {
-    initialUnreadContact: (state, action)=>{
-      const contactIds=action.payload;
-      contactIds.map(item=>{
-        state[item.contactId]={
-          unreadCount: 0,
-          messageIds: []
-        }
-      });
-    },
-    newMessageReceived: (state, action)=>{
-      const senderId=action.payload.senderId;
-      const messageId=action.payload.messageId;
-      if (state[senderId]) {
-        state[senderId].unreadCount += 1;
-        state[senderId].messageIds.push(messageId);
+    newMessageReceived: (state, action) => {
+      const { senderId, messageId } = action.payload;
+      if (state.item[senderId]) {
+        state.item[senderId].unreadCount += 1;
+        state.item[senderId].messageIds.push(messageId);
       } else {
-        state[senderId] = { 
+        state.item[senderId] = { 
           unreadCount: 1,
           messageIds: [messageId]
         };
       }
     },
-    
-    messageRead: (state, action)=>{
-      const senderId=action.payload.senderId;
-      if(state[senderId]){
-        state[senderId].unreadCount=0;
-        // clear arr
-        state[senderId].messageIds.length=0;
+    messageRead: (state, action) => {
+      const senderId = action.payload.senderId;
+      if(state.item[senderId]){
+        state.item[senderId].unreadCount = 0;
+        state.item[senderId].messageIds = [];
       }
     }
   },
+  extraReducers: builder => {
+    builder
+      .addCase(initialUnreadContacts.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(initialUnreadContacts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.item = action.payload;
+      })
+      .addCase(initialUnreadContacts.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      });
+  }
 });
 
-export const {newMessageReceived, messageRead}=unreadContactSlice.actions;
+export const { newMessageReceived, messageRead } = unreadContactSlice.actions;
 export default unreadContactSlice.reducer;

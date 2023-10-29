@@ -12,7 +12,7 @@ function PersonItem({_id, username, profilePictureURL }) {
   const contactId=_id;
   let link=contactId;
 
-  const unreadObj=useSelector(state=>state.unreadContact[contactId]);
+  const unreadObj=useSelector(state=>state.unreadContact.item[contactId]);
 
   const [isUnread, setIsUnread]=useState(false);
   const dispatch=useDispatch();

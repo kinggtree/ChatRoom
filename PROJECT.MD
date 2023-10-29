@@ -160,3 +160,15 @@ group: [
 ]
 
 ```
+
+## 13. 群组完整信息获取(fullGroupInfo)
+```
+const fullGroupInfo = {
+  groupName: group.groupName,
+  groupOwnerId: group.groupOwnerId,
+  groupMembers: group.groupMembers,
+  groupProfilePictureURL: URLPath + group.groupProfilePictureName,
+  group_intro: group.group_intro,
+  group_notice: group.group_notice
+};
+```
