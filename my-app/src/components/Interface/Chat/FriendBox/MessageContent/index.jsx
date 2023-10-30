@@ -100,7 +100,7 @@ function MessageContent({idsInfo}) {
       // 设置正在加载
       setIsLoading(true);
     };
-  },[idsInfo.receiverId]);
+  },[idsInfo.receiverId, idsInfo.senderId]);
 
 
 
@@ -132,7 +132,7 @@ function MessageContent({idsInfo}) {
     if (socket && isConnected) {
       fetchMessage();
     }
-  }, [socket]);
+  }, [socket, isConnected]);
 
 
   

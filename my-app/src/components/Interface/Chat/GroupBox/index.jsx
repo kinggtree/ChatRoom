@@ -40,7 +40,7 @@ function GroupBox() {
   useEffect(()=>{
     setIsLoading(true);
     dispatch(fetchFullGroupInfo(group_id));
-  },[location.pathname]);
+  },[location.pathname, dispatch, group_id]);
 
   useEffect(()=>{
     if(fullGroupInfoStatus==='succeeded'){
@@ -50,7 +50,7 @@ function GroupBox() {
       });
       setIsLoading(false);
     }
-  }, [fullGroupInfoStatus]);
+  }, [fullGroupInfoStatus, group_id, senderId]);
 
   const openGroupMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeGroupMenu=()=>setAnchorEl(null);

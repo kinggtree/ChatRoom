@@ -116,7 +116,7 @@ function MessageContent({idsInfo}) {
       // 设置正在加载
       setIsLoading(true);
     };
-  },[idsInfo.groupId]);
+  },[idsInfo.groupId, idsInfo.senderId]);
 
 
   // 获取新消息，添加到目前的消息列表并渲染
@@ -155,7 +155,7 @@ function MessageContent({idsInfo}) {
         socket.onmessage=null;
       }
     };
-  }, [socket]);
+  }, [socket, isConnected]);
 
   useEffect(()=>{
     if (messageEndRef.current) {

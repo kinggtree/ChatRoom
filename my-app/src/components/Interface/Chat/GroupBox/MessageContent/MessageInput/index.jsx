@@ -1,5 +1,5 @@
 //import axios from "axios";
-import React, { useContext, useState, useRef } from "react";
+import React, { useContext, useState } from "react";
 import { TextField, Button } from "@mui/material";
 import WebSocketContext from '../WebSocketContext'; 
 import SendIcon from '@mui/icons-material/Send';
