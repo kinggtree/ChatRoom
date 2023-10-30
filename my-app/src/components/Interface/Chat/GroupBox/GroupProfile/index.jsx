@@ -1,19 +1,47 @@
-import { CircularProgress, Typography, Avatar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { CircularProgress, Typography, Avatar, TextField, Button } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 import './styles.css';
 import ManageGroupMembers from "./ManageGroupMember";
 import ManageNotice from "./ManageNotice";
 
 function GroupProfile() {
   const [isLoading, setIsLoading] = useState(true);
+  const [intro, setIntro] = useState('');
+  const [isEdit, setIsEdit] = useState(false);
   const fullGroupInfo = useSelector(state => state.fullGroupInfo.item);
+  const userId=useSelector(state=>state.userInfo.item._id);
+  const isCreator=fullGroupInfo.groupOwnerId===userId ? true : false;
 
   useEffect(() => {
     if (fullGroupInfo) {
       setIsLoading(false);
+      setIntro(fullGroupInfo.groupIntro || '');
     }
   }, [fullGroupInfo]);
+
+  const handleIntroChange = (event) => {
+    setIntro(event.target.value);
+  };
+
+  const updateGroupIntro = () => {
+    axios.post('/api/updateGroupIntro', {'newIntro': intro, 'groupId': fullGroupInfo._id})
+      .then(() => {
+        alert('成功更新群组介绍');
+        setIsEdit(false);
+      }).catch(err => {
+        console.log(err);
+        alert("更新失败...");
+      });
+  };
+
+  const toggleEdit = () => {
+    setIsEdit(!isEdit);
+  };
 
   if (isLoading) {
     return (
@@ -25,17 +53,43 @@ function GroupProfile() {
 
   return (
     <div className="group-profile">
-      <Avatar
+      <img
         src={fullGroupInfo.groupProfilePictureURL}
         alt={`${fullGroupInfo.groupName}'s profile picture`}
-        className="profile-picture"
+        className="group-profile-picture"
       />
       <Typography variant="h4" className="group-name">{fullGroupInfo.groupName}</Typography>
-      <Typography className="group-intro">群介绍: {fullGroupInfo.groupIntro || "暂无介绍"}</Typography>
+      {isEdit&&isCreator ? (
+        <div className="intro-textfield-container">
+          <TextField
+            label="请输入新的群组介绍"
+            variant="outlined"
+            value={intro}
+            onChange={handleIntroChange}
+            className="intro-textfield"
+          />
+          <Button onClick={updateGroupIntro} className="save-button">
+            <SaveIcon />
+          </Button>
+          <Button onClick={toggleEdit} className="cancel-button">
+            <CancelIcon />
+          </Button>
+        </div>
+      ) : (
+        <div className="group-intro-container">
+          <Typography className="group-intro">
+            群介绍: {intro || "暂无介绍"}
+          </Typography>
+          {isCreator ? (
+          <Button onClick={toggleEdit} className="edit-button">
+            <EditIcon />
+          </Button>) : null}
+        </div>
+      )}
       <Typography className="group-notice-title">群通知:</Typography>
-      <ManageNotice />
+      <ManageNotice isCreator={isCreator} />
       <Typography className="group-members-title">群成员:</Typography>
-      <ManageGroupMembers />
+      <ManageGroupMembers isCreator={isCreator} />
     </div>
   );
 }

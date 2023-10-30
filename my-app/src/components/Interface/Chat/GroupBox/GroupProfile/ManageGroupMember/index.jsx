@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import axios from "axios";
+import './styles.css';
 
 import DeleteIcon from'@mui/icons-material/Delete';
-import { Avatar, Divider, IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import { Avatar, IconButton, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchFullGroupInfo } from '../../../../../../reduxActions/fullGroupInfoActions';
 
@@ -22,35 +23,30 @@ function MembersItem({_id, name, profilePictureURL, dispatchFullGroupInfo, isCre
   };
 
   return(
-    <div>
-      <ListItem
-      style={{ padding: '10px 0' }} 
-      secondaryAction={
-        isCreator ? (
-          <IconButton edge='end' aria-label='delete' onClick={removeMembers}>
-            <DeleteIcon />
-          </IconButton>
-        ) : null
-      }>
-        <ListItemAvatar>
-          <Avatar
-            alt={'profile photo of '+name}
-            src={profilePictureURL}
-          />
-        </ListItemAvatar>
-        <ListItemText primary={name} />
-      </ListItem>
-      <Divider />
-    </div>
-
+    <ListItem
+    className='manage-group-contact'
+    style={{'width': 'auto'}}
+    secondaryAction={
+      isCreator ? (
+        <IconButton edge='end' aria-label='delete' onClick={removeMembers}>
+          <DeleteIcon />
+        </IconButton>
+      ) : null
+    }>
+      <ListItemAvatar>
+        <Avatar
+          alt={'profile photo of '+name}
+          src={profilePictureURL}
+        />
+      </ListItemAvatar>
+      <ListItemText primary={name} />
+    </ListItem>
   );
 };
 
 
-function ManageGroupMembers(){
+function ManageGroupMembers({isCreator}){
   const fullGroupMembers = useSelector(state => state.fullGroupInfo.item.groupMembers);
-  const groupOwnerId=useSelector(state=>state.fullGroupInfo.item.groupOwnerId);
-  const userId=useSelector(state=>state.userInfo.item._id);
 
   const dispatch = useDispatch();
   const dispatchFullGroupInfo = useCallback(() => {
@@ -60,7 +56,7 @@ function ManageGroupMembers(){
   
   return(
     <div>
-      <List component="nav" className="contacts">
+      <List component="nav" className="manage-group-contacts">
         {
           Object.keys(fullGroupMembers).map(memberId=>{
             const member=fullGroupMembers[memberId];
@@ -70,7 +66,7 @@ function ManageGroupMembers(){
                     name={member.name} 
                     profilePictureURL={member.profilePictureURL} 
                     dispatchFullGroupInfo={dispatchFullGroupInfo} 
-                    isCreator={groupOwnerId===userId ? true : false} />
+                    isCreator={isCreator} />
           })
         }
       </List>

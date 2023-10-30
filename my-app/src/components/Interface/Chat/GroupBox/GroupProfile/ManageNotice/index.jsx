@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import axios from "axios";
 
+import './styles.css';
+
 import DeleteIcon from'@mui/icons-material/Delete';
-import { Divider, IconButton, List, ListItem, ListItemText, Button } from '@mui/material';
+import { IconButton, List, ListItem, ListItemText, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchFullGroupInfo } from '../../../../../../reduxActions/fullGroupInfoActions';
 import AddNotice from './AddNotice';
@@ -25,7 +27,8 @@ function NoticeItem({_id, groupId, content, dispatchFullGroupInfo, isCreator}){
   return(
     <div>
       <ListItem
-      style={{ padding: '10px 0' }} 
+      className='group-notice'
+      style={{'width': 'auto'}}
       secondaryAction={
         isCreator ? (
           <IconButton edge='end' aria-label='delete' onClick={removeNotice}>
@@ -35,7 +38,6 @@ function NoticeItem({_id, groupId, content, dispatchFullGroupInfo, isCreator}){
       }>
         <ListItemText primary={content} />
       </ListItem>
-      <Divider />
     </div>
 
   );
@@ -43,11 +45,9 @@ function NoticeItem({_id, groupId, content, dispatchFullGroupInfo, isCreator}){
 
 
 
-function ManageNotice(){
+function ManageNotice({isCreator}){
   const groupNotice = useSelector(state => state.fullGroupInfo.item.groupNotice);
-  const groupOwnerId=useSelector(state=>state.fullGroupInfo.item.groupOwnerId);
   const groupId=useSelector(state=>state.fullGroupInfo.item._id);
-  const userId=useSelector(state=>state.userInfo.item._id);
 
   const [isAddNoticeOpen, setIsAddNoticeOpen] = useState(false);
 
@@ -63,8 +63,7 @@ function ManageNotice(){
 
   
   return(
-    <div>
-      <Button onClick={openAddNotice}>添加群通知</Button>
+    <div className='group-notices clearfix'>
       <AddNotice groupId={groupId} isOpen={isAddNoticeOpen} setIsOpen={setIsAddNoticeOpen} dispatchFullGroupInfo={dispatchFullGroupInfo} />
       <List component="nav" className="contacts">
         {
@@ -75,10 +74,11 @@ function ManageNotice(){
                     groupId={groupId} 
                     content={notice.content}
                     dispatchFullGroupInfo={dispatchFullGroupInfo} 
-                    isCreator={groupOwnerId===userId ? true : false} />
+                    isCreator={isCreator} />
           })
         }
       </List>
+      {isCreator ? (<Button onClick={openAddNotice} className='add-notice-button'>添加群通知</Button>) : null}
     </div>
   );
 };

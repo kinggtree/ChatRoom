@@ -1,0 +1,16 @@
+.manage-group-contacts{
+  list-style-type: none;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;  /* 保持子元素在圆角边界内 */
+
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.manage-group-contact {
+  margin: 5px;
+  border: 1px solid rgb(203, 203, 203);
+  border-radius: 8px;
+}

@@ -630,6 +630,25 @@ router.post('/removeGroupNotice', async function(req, res) {
 
 
 
+// 更新新的群组介绍
+router.post('/updateGroupIntro', function(req, res){
+  if (!req.session._id) {
+    return res.status(401).send('Unauthorized');
+  }
+
+  Group.findOneAndUpdate(
+    {_id: req.body.groupId},
+    {$set: {group_intro: req.body.newIntro}}
+  ).then(()=>{
+    res.status(200).send();
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('internal server error');
+  });
+})
+
+
+
 // 由服务器主动发送未读提示(SSE连接)
 router.get('/serverSendNew', async function(req, res) {
   if (!req.session._id) {
@@ -698,7 +717,7 @@ router.get('/serverSendNew', async function(req, res) {
       clearInterval(heartbeatId);
       if (changeStream) changeStream.close();
       res.end();
-    }, 300000);  // 300,000毫秒 == 5分钟
+    }, 600000);  // 600,000毫秒 == 10分钟
 
     // 关闭连接
     res.on('close', () => {
