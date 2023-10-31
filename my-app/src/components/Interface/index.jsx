@@ -48,7 +48,7 @@ function Interface(){
     // 获取userInfo和GroupInfo
     dispatch(fetchUserInfo());
 
-  }, [dispatch, navigate]); // 该组件在dispatch变化时重新渲染
+  }, [dispatch]); // 该组件在dispatch变化时重新渲染
 
   // 获取用户所在的群的消息
   useEffect(()=>{
