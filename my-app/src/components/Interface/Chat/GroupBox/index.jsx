@@ -49,8 +49,12 @@ function GroupBox() {
         groupId: group_id,
       });
       setIsLoading(false);
-    }
-  }, [fullGroupInfoStatus, group_id, senderId]);
+    };
+
+    return ()=>{
+      setIsLoading(true);
+    };
+  }, [fullGroupInfoStatus]);
 
   const openGroupMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeGroupMenu=()=>setAnchorEl(null);
