@@ -6,12 +6,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# 1. 执行startDB.sh脚本
-./startDB.sh
-
-# 3. 在/root/ChatRoom/my-api目录下使用pm2启动Express服务
+# 在/root/ChatRoom/my-api目录下使用pm2启动Express服务
 cd my-api
 pm2 start npm --name "Express-Service" -- start
 
-# 4. 启动nginx服务
+# 启动nginx服务
 service nginx start

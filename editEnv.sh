@@ -6,12 +6,11 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# 永久设置系统环境变量EXPRESS_API_BASE_URL
-echo "export EXPRESS_API_BASE_URL='123.60.24.173:5000'" >> /etc/environment
+# 动态获取公网IP并设置为环境变量
+public_ip=$(curl -s ifconfig.me)
+echo "export EXPRESS_API_BASE_URL='$public_ip:5000'" >> /etc/environment
 source /etc/environment
 
-
 # 修改.env.production文件中的REACT_APP_API_BASE_URL变量
-env_file="my-app/.env.production"
-api_url="123.60.24.173:5000"
-sed -i "/^REACT_APP_API_BASE_URL=/c\REACT_APP_API_BASE_URL=$api_url" $env_file
+env_file="/root/ChatRoom/my-app/.env.production"
+sed -i "/^REACT_APP_API_BASE_URL=/c\REACT_APP_API_BASE_URL=$public_ip:5000" $env_file
