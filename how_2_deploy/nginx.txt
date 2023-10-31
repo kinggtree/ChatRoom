@@ -3,11 +3,13 @@ nginx配置文件:
 文件目录:
 使用nginx -t查看
 
+添加如下内容
+
 server {
     listen 3000;
 
     location / {
-        root /...;
+        root /srv/build
         try_files $uri /index.html;
     }
     
@@ -21,7 +23,9 @@ server {
     }
 }
 
-build的文件目录放在 /... 中
+默认将/srv/build作为放置HTML文件的目录
+
+
 
 启动、停止和重启 Nginx
 使用下面的命令可以分别启动、停止和重启 Nginx：

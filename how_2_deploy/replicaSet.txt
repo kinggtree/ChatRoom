@@ -1,17 +1,23 @@
+在mongodb官网中查询对应系统安装方法（安装mongodb）
+
 https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set-for-testing/
 
+创建必备文件夹
 sudo mkdir -p /srv/profile_photos
 
 sudo mkdir -p /srv/mongodb/rs0-0  /srv/mongodb/rs0-1 /srv/mongodb/rs0-2
 
+启动三个副本集
 sudo mongod --replSet rs0 --port 27017 --dbpath /srv/mongodb/rs0-0 --oplogSize 128
 
 sudo mongod --replSet rs0 --port 27018 --dbpath /srv/mongodb/rs0-1 --oplogSize 128
 
 sudo mongod --replSet rs0 --port 27019 --dbpath /srv/mongodb/rs0-2 --oplogSize 128
 
+连接到27017的副本集进行配置
 mongosh --port 27017
 
+配置参数
 rsconf = {
   _id: "rs0",
   members: [
@@ -30,6 +36,8 @@ rsconf = {
    ]
 }
 
+应用参数
 rs.initiate( rsconf )
 
+确认是否配置成功
 rs.conf()

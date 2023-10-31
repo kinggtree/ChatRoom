@@ -1,0 +1,30 @@
+
+Guidance of starting ChatRoom
+
+1. Start MongoDB server
+
+sudo ./startDB.sh
+
+-----------------------
+
+2. Set env
+
+sudo ./editEnv.sh
+
+-----------------------
+
+3. Build React App and move build files
+
+cd my-ppp
+
+npm run build
+
+rm -rf /srv/build
+
+mv build /srv
+
+-----------------------
+
+4. Start Nginx and Express-Service services
+
+sudo ./startAPP.sh
