@@ -49,7 +49,11 @@ function FriendBox() {
         receiverId: user_id,
       });
       setIsLoading(false);
-    }
+    };
+
+    return ()=>{
+      setIsLoading(true);
+    };
   }, [friendInfoStatus, senderId, user_id]);
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);

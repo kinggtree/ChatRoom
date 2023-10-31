@@ -58,16 +58,16 @@ function GroupBox() {
   const toGroupInfo=()=>{
     navigate('groupProfile');
     closeGroupMenu();
-  }
+  };
 
   const toChat=()=>{
     navigate('');
     closeGroupMenu();
-  }
+  };
 
   if(isLoading){
     return(<CircularProgress />)
-  }
+  };
 
   return (
       <Container style={{ height: '100%' }}>

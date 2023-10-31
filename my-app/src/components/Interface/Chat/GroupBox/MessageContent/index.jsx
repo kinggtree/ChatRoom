@@ -115,6 +115,7 @@ function MessageContent({idsInfo}) {
       setMessage([]);
       // 设置正在加载
       setIsLoading(true);
+      setIsConnected(false);
     };
   },[idsInfo.groupId, idsInfo.senderId]);
 
@@ -149,12 +150,15 @@ function MessageContent({idsInfo}) {
     if (socket && isConnected) {
       fetchMessage();
     };
+<<<<<<< HEAD
 
     return ()=>{
       if(socket){
         socket.onmessage=null;
       }
     };
+=======
+>>>>>>> fix_useEffect
   }, [socket, isConnected]);
 
   useEffect(()=>{

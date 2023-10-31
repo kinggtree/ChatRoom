@@ -3,9 +3,12 @@ import axios from 'axios';
 
 export const fetchFullContact = createAsyncThunk(
   'fullContact',
-  async (contactIds) => {
-    const contactIdsArr = contactIds.map(item => item.contactId);
-    const response = await axios.post('/api/fullContact', { 'contactIds': contactIdsArr });
+  async (contactIds)=>{
+    let contactIdsArr=[];
+    await contactIds.forEach(item=>{
+      contactIdsArr.push(item.contactId);
+    });
+    const response=await axios.post('/api/fullContact', {'contactIds': contactIdsArr});
     return response.data;
   }
 );
