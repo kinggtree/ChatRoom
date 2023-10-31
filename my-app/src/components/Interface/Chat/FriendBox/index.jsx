@@ -40,7 +40,7 @@ function FriendBox() {
   useEffect(()=>{
     setIsLoading(true);
     dispatch(fetchFriendInfo(user_id));
-  },[location.pathname]);
+  },[location.pathname, dispatch, user_id]);
 
   useEffect(()=>{
     if(friendInfoStatus==='succeeded'){
@@ -49,8 +49,12 @@ function FriendBox() {
         receiverId: user_id,
       });
       setIsLoading(false);
-    }
-  }, [friendInfoStatus])
+    };
+
+    return ()=>{
+      setIsLoading(true);
+    };
+  }, [friendInfoStatus, senderId, user_id]);
 
   const openFriendMenu=(event)=>setAnchorEl(event.currentTarget);
   const closeFriendMenu=()=>setAnchorEl(null);
@@ -58,16 +62,16 @@ function FriendBox() {
   const toFriendInfo=()=>{
     navigate('friendProfile');
     closeFriendMenu();
-  }
+  };
 
   const toChat=()=>{
     navigate('');
     closeFriendMenu();
-  }
+  };
 
   if(isLoading){
     return(<CircularProgress />)
-  }
+  };
 
   return (
       <Container style={{ height: '100%' }}>

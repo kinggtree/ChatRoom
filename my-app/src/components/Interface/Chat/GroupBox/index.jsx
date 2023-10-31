@@ -40,7 +40,7 @@ function GroupBox() {
   useEffect(()=>{
     setIsLoading(true);
     dispatch(fetchFullGroupInfo(group_id));
-  },[location.pathname]);
+  },[location.pathname, dispatch, group_id]);
 
   useEffect(()=>{
     if(fullGroupInfoStatus==='succeeded'){
@@ -49,7 +49,11 @@ function GroupBox() {
         groupId: group_id,
       });
       setIsLoading(false);
-    }
+    };
+
+    return ()=>{
+      setIsLoading(true);
+    };
   }, [fullGroupInfoStatus]);
 
   const openGroupMenu=(event)=>setAnchorEl(event.currentTarget);
@@ -58,16 +62,16 @@ function GroupBox() {
   const toGroupInfo=()=>{
     navigate('groupProfile');
     closeGroupMenu();
-  }
+  };
 
   const toChat=()=>{
     navigate('');
     closeGroupMenu();
-  }
+  };
 
   if(isLoading){
     return(<CircularProgress />)
-  }
+  };
 
   return (
       <Container style={{ height: '100%' }}>

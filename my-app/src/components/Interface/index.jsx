@@ -55,7 +55,7 @@ function Interface(){
     if(userInfoStatus==='succeeded') {
       dispatch(fetchGroupInfo(userInfoGroups));
     }
-  }, [userInfoStatus])
+  }, [userInfoStatus, dispatch, userInfoGroups]);
   
   // 当联系人名单和群组信息名单加载完成后，初始化未读联系人名单
   useEffect(()=>{
@@ -66,12 +66,12 @@ function Interface(){
       const totalContactId=userInfoContact.map(userInfo=>{
         return userInfo.contactId;
       })
-      groupInfo.map(group=>{
+      groupInfo.forEach(group=>{
         totalContactId.push(group._id);
       })
       dispatch(initialUnreadContacts(totalContactId));
     }
-  }, [groupInfoStatus]);
+  }, [groupInfoStatus, dispatch, groupInfo, userInfoContact]);
 
   // 当未读联系人列表加载成功后取消loading状态
   useEffect(()=>{
@@ -103,17 +103,17 @@ function Interface(){
         console.log("sended close req...");
       }
     };
-  }, [unreadContactStatus])
+  }, [unreadContactStatus, dispatch]);
 
   if(isLoading) {
     return <CircularProgress />
-  }
+  };
   
   if(userInfoStatus==='failed'){
     alert("出现错误，请重新登录")
     navigate('/');
     return;
-  }
+  };
 
   return(
     <div>

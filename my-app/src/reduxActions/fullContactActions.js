@@ -5,7 +5,7 @@ export const fetchFullContact=createAsyncThunk(
   'fullContact',
   async (contactIds)=>{
     let contactIdsArr=[];
-    await contactIds.map(item=>{
+    await contactIds.forEach(item=>{
       contactIdsArr.push(item.contactId);
     });
     const response=await axios.post('/api/fullContact', {'contactIds': contactIdsArr});

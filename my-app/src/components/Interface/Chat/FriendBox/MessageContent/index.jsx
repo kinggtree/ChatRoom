@@ -99,8 +99,9 @@ function MessageContent({idsInfo}) {
       setMessage([]);
       // 设置正在加载
       setIsLoading(true);
+      setIsConnected(false);
     };
-  },[idsInfo.receiverId]);
+  },[idsInfo.receiverId, idsInfo.senderId]);
 
 
 
@@ -131,8 +132,8 @@ function MessageContent({idsInfo}) {
     // 如果socket有新消息
     if (socket && isConnected) {
       fetchMessage();
-    }
-  }, [socket]);
+    };
+  }, [socket, isConnected]);
 
 
   

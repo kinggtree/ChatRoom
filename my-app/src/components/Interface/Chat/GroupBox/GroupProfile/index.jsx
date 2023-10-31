@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { CircularProgress, Typography, Avatar, TextField, Button } from "@mui/material";
+import { CircularProgress, Typography, TextField, Button } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -55,7 +55,7 @@ function GroupProfile() {
     <div className="group-profile">
       <img
         src={fullGroupInfo.groupProfilePictureURL}
-        alt={`${fullGroupInfo.groupName}'s profile picture`}
+        alt={`${fullGroupInfo.groupName}`}
         className="group-profile-picture"
       />
       <Typography variant="h4" className="group-name">{fullGroupInfo.groupName}</Typography>

@@ -89,7 +89,7 @@ function ManageContacts(){
       sortContact(fullContact);     // 列表排序
       setIsLoading(false);
     }
-  }, [contactStatus]);
+  }, [contactStatus, contacts, dispatch, fullContact]);
   
   
 
