@@ -78,7 +78,7 @@ function ManageContacts(){
     });
     
     setOrderedContact(sortedContacts);
-  }
+  };
 
 
   useEffect(()=>{

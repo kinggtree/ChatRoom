@@ -14,3 +14,9 @@
   border: 1px solid rgb(203, 203, 203);
   border-radius: 8px;
 }
+
+
+.group-member-toolbar {
+  display: flex;
+  justify-content: right;
+}

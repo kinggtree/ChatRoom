@@ -1,8 +1,12 @@
 var express = require('express');
 var router = express.Router();
-const bcrypt = require('bcrypt');
-var fs=require('fs');
 require('dotenv').config();
+
+var fs=require('fs');
+const multer=require('multer');
+const sharp=require('sharp');
+const bcrypt = require('bcrypt');
+
 
 
 const mongoose=require("mongoose");
@@ -645,7 +649,38 @@ router.post('/updateGroupIntro', function(req, res){
     console.log(err);
     res.status(500).send('internal server error');
   });
-})
+});
+
+
+// 上传并保存头像的API
+// 设置存储的位置和文件名
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post('/uploadAvatar', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const _id = req.body._id;
+    if (!_id) {
+      return res.status(400).send('Missing _id parameter.');
+    }
+
+    const fileName = `${_id}.jpg`; // 你可以根据需求修改文件名和格式
+    const filePath = path.join(__dirname, 'static/profile_photos', fileName);
+
+    await sharp(req.file.buffer)
+      .toFormat('jpg') // 转换格式为jpeg
+      .toFile(filePath);
+
+    res.send('File uploaded and processed successfully.');
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 

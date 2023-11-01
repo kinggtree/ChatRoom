@@ -13,6 +13,7 @@ import EditPwd from "./EditPwd";
 
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPersonalInfo } from "../../../reduxActions/personalInfoActions";
+import UploadAvatar from "../UploadAvatar";
 
 
 
@@ -61,6 +62,8 @@ const UserProfile = function() {
           <ListItemText primary={"修改密码"} />
         </ListItemButton>
       </List>
+
+
 
       <div className="user-operation">
 

@@ -53,6 +53,10 @@ function CreateGroup({ isOpen, setIsOpen }){
   const handleClose=()=> setIsOpen(false);
 
   const handleSubmit=()=>{
+    if(groupName.trim().length===0) {
+      alert("组名不能为空");
+      return;
+    }
     axios.post('/api/createNewGroup', {
       groupName: groupName,
       groupMemberIds: groupMemberIds

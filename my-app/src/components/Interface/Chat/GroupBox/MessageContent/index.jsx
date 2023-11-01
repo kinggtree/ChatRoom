@@ -129,7 +129,6 @@ function MessageContent({idsInfo}) {
         socket.onmessage = function(event) {
           const receivedMessage = JSON.parse(event.data);
           let newMessages = [];
-          console.log(receivedMessage);
 
           // 如果第一次获取所有消息，这个时候后端会发送一个叫messages的数组
           if (receivedMessage.messages) {
