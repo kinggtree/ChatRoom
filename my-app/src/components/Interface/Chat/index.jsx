@@ -22,14 +22,14 @@ function Chat(){
       <Grid container spacing={1}>
         {/* 使用 isMediumScreen 判断是否要显示 Contacts 组件 */}
         {!isMediumScreen && (
-          <Grid item sm={3}>
+          <Grid item xs={3}>
             <Paper className="contacts">
               <Contacts />
             </Paper>
           </Grid>
         )}
         
-        <Grid item sm={isMediumScreen ? 12 : 9}>
+        <Grid item xs={isMediumScreen ? 12 : 9}>
           <div className="chat-interface">
             {/* 当屏幕宽度较小时，显示一个按钮来打开 Drawer */}
             {isMediumScreen && (

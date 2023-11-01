@@ -119,11 +119,11 @@ function Interface(){
     <div>
       <Grid container spacing={2}>
 
-        <Grid item sm={12}>
+        <Grid item xs={12}>
           <TopBar />
         </Grid>
 
-        <Grid item sm={12}>
+        <Grid item xs={12}>
           <Routes>
             <Route
               path="/chat/*"
