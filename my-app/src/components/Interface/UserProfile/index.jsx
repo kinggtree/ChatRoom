@@ -13,8 +13,8 @@ import EditPwd from "./EditPwd";
 
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPersonalInfo } from "../../../reduxActions/personalInfoActions";
-import UploadAvatar from "../UploadAvatar";
 
+import AvatarUploader from "../AvatarUploader";
 
 
 // 用户档案总界面
@@ -45,6 +45,10 @@ const UserProfile = function() {
         src={personalInfo.profilePictureURL} 
         alt={`${personalInfo.username}'s profile`} 
         className="profile-picture" 
+      />
+      <AvatarUploader
+        type={'personal'} 
+        _id={personalInfo._id}
       />
       <h1 className="username">{personalInfo.username}</h1>
       <p> 点赞数: {personalInfo.like}</p>

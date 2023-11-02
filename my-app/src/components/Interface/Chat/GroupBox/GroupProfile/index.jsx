@@ -8,6 +8,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import './styles.css';
 import ManageGroupMembers from "./ManageGroupMember";
 import ManageNotice from "./ManageNotice";
+import AvatarUploader from "../../../AvatarUploader";
 
 function GroupProfile() {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,6 +59,13 @@ function GroupProfile() {
         alt={`${fullGroupInfo.groupName}`}
         className="group-profile-picture"
       />
+      
+      {isCreator ? 
+      <AvatarUploader
+        type={'group'}
+        _id={fullGroupInfo._id}
+      /> : null }
+
       <Typography variant="h4" className="group-name">{fullGroupInfo.groupName}</Typography>
       {isEdit&&isCreator ? (
         <div className="intro-textfield-container">

@@ -30,6 +30,7 @@
     └── src
         ├── components
         │   ├── Interface
+        │   │   ├── AvatarUploader
         │   │   ├── Chat
         │   │   │   ├── Contacts
         │   │   │   │   ├── GroupItem

@@ -4,7 +4,6 @@ require('dotenv').config();
 
 var fs=require('fs');
 const multer=require('multer');
-const sharp=require('sharp');
 const bcrypt = require('bcrypt');
 
 
@@ -207,6 +206,7 @@ router.post('/personalProfile', function(req, res) {
     .then((response)=>{
       const URLPath=process.env.EXPRESS_API_BASE_URL+"/static/profile_photos/";
       res.status(200).send({
+        '_id': req.session._id,
         'username': response.username,
         'profilePictureURL': URLPath+response.profilePictureName,
         'self_intro': response.self_intro,
@@ -656,31 +656,48 @@ router.post('/updateGroupIntro', function(req, res){
 // 设置存储的位置和文件名
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const path = require('path');
 
-router.post('/uploadAvatar', upload.single('file'), async (req, res) => {
+router.post('/uploadAvatar', upload.single('image'), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).send('No file uploaded.');
+    const { _id, type } = req.body;
+    if (!_id || !type) {
+      return res.status(400).json({ message: 'Invalid input' });
     }
 
-    const _id = req.body._id;
-    if (!_id) {
-      return res.status(400).send('Missing _id parameter.');
+    if (!req.session._id) {
+      return res.status(401).send('Unauthorized');
     }
 
-    const fileName = `${_id}.jpg`; // 你可以根据需求修改文件名和格式
-    const filePath = path.join(__dirname, 'static/profile_photos', fileName);
+    // 获取文件
+    const image = req.file.buffer;
 
-    await sharp(req.file.buffer)
-      .toFormat('jpg') // 转换格式为jpeg
-      .toFile(filePath);
+    // 指定保存路径和文件名
+    const imagePath = path.join(__dirname, 'static/profile_photos', `${_id}.png`);
+    console.log(imagePath);
 
-    res.send('File uploaded and processed successfully.');
+    // 保存文件
+    fs.writeFileSync(imagePath, image);
+
+    const update = type === 'personal' ? { profilePictureName: `${_id}.png` } : { groupProfilePictureName: `${_id}.png` };
+    const Model = type === 'personal' ? User : Group;
+
+    Model.findOneAndUpdate(
+      { _id: _id },
+      { $set: update }
+    ).then(() => {
+      res.json({ message: `${type} image uploaded successfully!`, status: 200 });
+    }).catch(err => {
+      console.error('Error updating database: ', err);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+
   } catch (error) {
-    console.error('Error uploading file:', error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error uploading image: ', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 
 

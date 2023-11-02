@@ -23,4 +23,15 @@
 /my-app/yarn-debug.log*
 /my-app/yarn-error.log*
 
+# 忽略key.txt文件
 /my-api/key.txt
+
+# 首先忽略profile_photos目录下的所有文件
+my-api/static/profile_photos/*
+
+# 然后使用!前缀来重新包含你想要跟踪的文件
+!my-api/static/profile_photos/default_female.png
+!my-api/static/profile_photos/default_group.jpg
+!my-api/static/profile_photos/default.png
+!my-api/static/profile_photos/gun-ship.jpg
+

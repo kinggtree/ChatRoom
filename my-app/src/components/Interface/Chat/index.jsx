@@ -7,6 +7,7 @@ import { Route, Routes } from "react-router-dom";
 import './styles.css'
 import GroupBox from './GroupBox';
 
+
 function Chat(){
   const theme = useTheme();
   const isMediumScreen = useMediaQuery(theme.breakpoints.down('md')); // 适应中等或更小尺寸的屏幕

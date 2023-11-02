@@ -12,6 +12,7 @@ import MessageContent from "./MessageContent";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFriendInfo } from "../../../../reduxActions/friendActions";
 
+
 import './styles.css';
 
 
