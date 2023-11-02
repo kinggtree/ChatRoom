@@ -9,6 +9,44 @@ import 'cropperjs/dist/cropper.css';
 import axios from 'axios';
 import EditIcon from '@mui/icons-material/Edit';
 
+function resizeImage(file, callback) {
+  const maxWidth=800;
+  const maxHeight=800;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = document.createElement('img');
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height *= maxWidth / width));
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = Math.round((width *= maxHeight / height));
+          height = maxHeight;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob((blob) => {
+        callback(blob);
+      }, file.type);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+
 function UploadImage({ open, handleOpen, _id, type }) {
   const [image, setImage] = useState(null);
   const [cropper, setCropper] = useState(null);
@@ -26,12 +64,18 @@ function UploadImage({ open, handleOpen, _id, type }) {
     } else if (e.target) {
       files = e.target.files;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImage(reader.result);
-      handleOpen(true);
-    };
-    reader.readAsDataURL(files[0]);
+    const file = files[0];
+    if (!file) return;
+
+    // 调整图片尺寸
+    resizeImage(file, (blob) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result);
+        handleOpen(true);
+      };
+      reader.readAsDataURL(blob);
+    });
   };
 
   const handleUpload = async () => {

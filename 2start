@@ -1,4 +1,5 @@
 
+
 Guidance of starting ChatRoom
 
 1. Start MongoDB server
@@ -28,3 +29,5 @@ mv build /srv
 4. Start Nginx and Express-Service services
 
 sudo ./startAPP.sh
+
+
