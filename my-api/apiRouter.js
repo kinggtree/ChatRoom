@@ -633,6 +633,25 @@ router.post('/removeGroupNotice', async function(req, res) {
 });
 
 
+router.post('/removeGroupMembers', function(req, res) {
+  if (!req.session._id)
+    return res.status(401).send('Unauthorized');
+
+  const memberId=req.body.memberId;
+  const groupId=req.body.groupId;
+
+  Group.findByIdAndUpdate(
+    {_id: groupId},
+    {$pull: {groupMembers: {_id: memberId}}}
+  ).then(()=>{
+    res.status(200).send('succeesfully remove member!');
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).send('internal server error');
+  });
+})
+
+
 
 // 更新新的群组介绍
 router.post('/updateGroupIntro', function(req, res){

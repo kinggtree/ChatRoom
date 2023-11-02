@@ -10,11 +10,11 @@ import SortByAlphaIcon from '@mui/icons-material/SortByAlpha';
 
 
 
-function MembersItem({_id, name, profilePictureURL, dispatchFullGroupInfo, isCreator}){
+function MembersItem({memberId, groupId, name, profilePictureURL, dispatchFullGroupInfo, isCreator}){
 
   const removeMembers=function(){
     if(isCreator){
-      axios.post('/api/removeGroupMembers', {'memberId': _id})
+      axios.post('/api/removeGroupMembers', {'memberId': memberId, 'groupId': groupId})
       .then(()=>{
         alert("成功删除");
         dispatchFullGroupInfo();
@@ -49,6 +49,7 @@ function MembersItem({_id, name, profilePictureURL, dispatchFullGroupInfo, isCre
 
 function ManageGroupMembers({isCreator}){
   const fullGroupMembers = useSelector(state => state.fullGroupInfo.item.groupMembers);
+  const fullGroupId=useSelector(state=>state.fullGroupInfo.item._id);
   const fullGroupStatus=useSelector(state=>state.fullGroupInfo.status);
 
   const [isSort, setIsSort]=useState(false);
@@ -121,7 +122,8 @@ function ManageGroupMembers({isCreator}){
             const member=usingMembers[memberId];
             return <MembersItem 
                     key={memberId} 
-                    _id={memberId} 
+                    memberId={memberId}
+                    groupId={fullGroupId}  
                     name={member.name} 
                     profilePictureURL={member.profilePictureURL} 
                     dispatchFullGroupInfo={dispatchFullGroupInfo} 
