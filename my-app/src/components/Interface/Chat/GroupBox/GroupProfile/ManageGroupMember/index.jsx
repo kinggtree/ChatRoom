@@ -61,7 +61,7 @@ function ManageGroupMembers({isCreator}){
 
   const dispatch = useDispatch();
   const dispatchFullGroupInfo = useCallback(() => {
-    dispatch(fetchFullGroupInfo());
+    dispatch(fetchFullGroupInfo(fullGroupId));
   }, [dispatch]);
 
 

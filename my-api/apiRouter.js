@@ -640,9 +640,9 @@ router.post('/removeGroupMembers', function(req, res) {
   const memberId=req.body.memberId;
   const groupId=req.body.groupId;
 
-  Group.findByIdAndUpdate(
+  Group.findOneAndUpdate(
     {_id: groupId},
-    {$pull: {groupMembers: {_id: memberId}}}
+    {$pull: {groupMembers: {userId: memberId}}}
   ).then(()=>{
     res.status(200).send('succeesfully remove member!');
   }).catch(err=>{
